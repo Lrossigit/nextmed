@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicione o usuario</title>
+</head>
+<body>
+    
+    <form id="forms" action="save" method="POST">
+        <p>
+          <label>
+            Nome Completo:
+            <input type="text" name="name" />
+          </label>
+        </p>
+        <p>
+          <label>
+            CPF:
+            <input type="number" name="CPF" />
+          </label>
+        </p>
+        <p>
+          <label>
+            Data de nasc:
+            <input type="date" name="birth" />
+          </label>
+        </p>
+        <p>
+          <label for="gender">Gênero:</label>
+          <select id="gender" name="genero" type="enum">
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Binario">Binario</option>
+            <option value="NãoBinario">NãoBinario</option>
+            <option value="Transgenero">Transgenero</option>
+          </select>
+        </p>
+        <p>
+          <label>
+            Telefone:
+            <input type="number" name="fonenumber" />
+          </label>
+        </p>
+        <p>
+          <label>Já Fumou?</label>
+          <input type="radio" name="smoker" value="Sim" required> Sim
+          <input type="radio" name="smoker" value="Não" required> Não
+        </p>
+        <p>
+          <input type="submit" value="salvar" />
+        </p>
+      </form>
+
+</body>
+</html>

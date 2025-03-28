@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerenciamento dos cadastros</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <script>
+      async function carregarPacientes() {
+        try {
+          const resposta = await fetch("/api/pacientes");
+          const pacientes = await resposta.json();
+
+          let tabela = document.querySelector("#tabelaPacientes tbody");
+          tabela.innerHTML = "";
+
+          pacientes.forEach((paciente) => {
+            let linha = `
+        <tr>
+          <td>${paciente.CPF}</td>
+          <td>${paciente.name}</td>
+          <td>${paciente.birth}</td>
+          <td>${paciente.age}</td>
+          <td>${paciente.genero}</td>
+          <td>${paciente.fonenumber}</td>
+          <td>${paciente.smoker}</td>
+          <td><button class="edit-btn" data-id="${paciente._id}">Editar</button></td>
+          <td><button class="delete-btn" data-id="${paciente._id}">Deletar</button></td>
+        </tr>
+      `;
+            tabela.innerHTML += linha;
+          });
+
+          // Adiciona eventos para os botões de deletar
+          document.querySelectorAll(".delete-btn").forEach((button) => {
+            button.addEventListener("click", async (e) => {
+              const patientId = e.target.getAttribute("data-id");
+              const response = await fetch("/delete", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: patientId }),
+              });
+
+              const result = await response.json();
+              if (result.success) {
+                alert("Paciente deletado com sucesso!");
+                carregarPacientes(); // Recarrega a tabela sem precisar remover manualmente a linha
+              } else {
+                alert("Erro ao deletar o paciente.");
+              }
+            });
+          });
+
+          // Adiciona eventos para os botões de editar
+          document.querySelectorAll(".edit-btn").forEach((button) => {
+            button.addEventListener("click", (e) => {
+              const patientId = e.target.getAttribute("data-id");
+              const paciente = pacientes.find((p) => p._id === patientId);
+
+              if (paciente) {
+                document.getElementById("CPF").value = paciente.CPF;
+                document.getElementById("name").value = paciente.name;
+                document.getElementById("birth").value = paciente.birth
+                  .split("/")
+                  .reverse()
+                  .join("-");
+                document.getElementById("genero").value = paciente.genero;
+                document.getElementById("fonenumber").value =
+                  paciente.fonenumber;
+                document.getElementById("smokerSim").checked =
+                  paciente.smoker === "Sim";
+                document.getElementById("smokerNao").checked =
+                  paciente.smoker === "Não";
+
+                document.getElementById("telaedit").style.display = "block";
+
+                document.getElementById("formedit").onsubmit = async (
+                  event
+                ) => {
+                  event.preventDefault();
+
+                  const formData = new FormData(event.target);
+                  const updatedPaciente = Object.fromEntries(
+                    formData.entries()
+                  );
+                  updatedPaciente.id = patientId;
+
+                  const response = await fetch("/edit", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedPaciente),
+                  });
+
+                  const result = await response.json();
+                  if (result.success) {
+                    alert("Paciente atualizado com sucesso!");
+                    document.getElementById("telaedit").style.display = "none";
+                    carregarPacientes();
+                  } else {
+                    alert("Erro ao atualizar o paciente.");
+                  }
+                };
+              }
+            });
+          });
+        } catch (error) {
+          console.error("Erro ao carregar pacientes:", error);
+        }
+      }
+
+      window.onload = carregarPacientes;
+    </script>
+  </head>
+  <body>
+    <h1>Lista de Pacientes</h1>
+
+    <table border="1" id="tabelaPacientes">
+      <thead>
+        <tr>
+          <th>CPF</th>
+          <th>Nome</th>
+          <th>Data de Nascimento</th>
+          <th>Idade</th>
+          <th>Genero</th>
+          <th>Telefone</th>
+          <th>Já Fumou?</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <br />
+
+    <button onclick="window.location.href='/AddUser'">
+      Adicionar Paciente
+    </button>
+
+    <div id="telaedit" style="display: none">
+      <div class="form">
+        <form id="formedit" action="edit" method="POST">
+          <p>
+            <label
+              >Nome Completo:
+              <input type="text" name="name" id="name" required />
+            </label>
+          </p>
+          <p>
+            <label
+              >CPF:
+              <input type="number" name="CPF" id="CPF" required />
+            </label>
+          </p>
+          <p>
+            <label
+              >Data de nascimento:
+              <input type="date" name="birth" id="birth" required />
+            </label>
+          </p>
+          <p>
+            <label for="genero">Gênero:</label>
+            <select id="genero" name="genero" required>
+              <option value="Masculino">Masculino</option>
+              <option value="Feminino">Feminino</option>
+              <option value="Binario">Binário</option>
+              <option value="NãoBinario">Não Binário</option>
+              <option value="Transgenero">Transgênero</option>
+            </select>
+          </p>
+          <p>
+            <label
+              >Telefone:
+              <input type="number" name="fonenumber" id="fonenumber" required />
+            </label>
+          </p>
+          <p>
+            <label>Já Fumou?</label>
+            <input
+              type="radio"
+              name="smoker"
+              value="Sim"
+              id="smokerSim"
+              required
+            />
+            Sim
+            <input
+              type="radio"
+              name="smoker"
+              value="Não"
+              id="smokerNao"
+              required
+            />
+            Não
+          </p>
+          <p>
+            <input type="submit" value="Salvar" />
+          </p>
+
+          <button onclick="window.location.href='/pagetable'"> Voltar </button>
+
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

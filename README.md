@@ -30,10 +30,10 @@ Instale my-project com npm
 ## Autores
 
 - [@Pedro](https://www.github.com/pedr0almd)
-- [@Vitória](https://www.github.com/pedr0almd)
+- [@Vitória](https://www.github.com/vitoria-bandeira)
 - [@Daniela](https://www.github.com/pdanib)
-- [@Welber](https://www.github.com/pedr0almd)
-- [@Lucas](https://www.github.com/pedr0almd)
-- [@Ryan](https://www.github.com/pedr0almd)
+- [@Welber](https://www.github.com/)
+- [@Lucas](https://www.github.com/lrossigit)
+- [@Ryan](https://www.github.com/)
 
 

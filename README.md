@@ -32,7 +32,7 @@ Instale my-project com npm
 - [@Pedro](https://www.github.com/pedr0almd)
 - [@Vitória](https://www.github.com/vitoria-bandeira)
 - [@Daniela](https://www.github.com/pdanib)
-- [@Welber](https://www.github.com/)
+- [@Welber](https://www.github.com/wjr154)
 - [@Lucas](https://www.github.com/lrossigit)
 - [@Ryan](https://www.github.com/)
 

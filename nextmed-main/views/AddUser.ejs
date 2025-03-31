@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styleAddUsr.css">
     <title>Adicione o usuario</title>
 </head>
 <body>
@@ -22,7 +23,7 @@
         </p>
         <p>
           <label>
-            Data de nasc:
+            Data de nascimento:
             <input type="date" name="birth" />
           </label>
         </p>
@@ -30,22 +31,20 @@
           <label for="gender">Gênero:</label>
           <select id="gender" name="genero" type="enum">
             <option value="Masculino">Masculino</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Binario">Binario</option>
-            <option value="NãoBinario">NãoBinario</option>
-            <option value="Transgenero">Transgenero</option>
+            <option value="Feminino">Feminino</option> 
+            <option value="NãoBinario">Não Binario</option> 
           </select>
+        </p>       
+        <p>
+          <label>É fumante?</label>
+          <input type="radio" name="smoker" value="Sim" required> Sim
+          <input type="radio" name="smoker" value="Não" required> Não
         </p>
         <p>
           <label>
             Telefone:
             <input type="number" name="fonenumber" />
           </label>
-        </p>
-        <p>
-          <label>Já Fumou?</label>
-          <input type="radio" name="smoker" value="Sim" required> Sim
-          <input type="radio" name="smoker" value="Não" required> Não
         </p>
         <p>
           <input type="submit" value="salvar" />

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gerenciamento dos cadastros</title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="stylePagetable.css">
     <script>
       async function carregarPacientes() {
         try {
@@ -48,7 +48,7 @@
                 alert("Paciente deletado com sucesso!");
                 carregarPacientes(); // Recarrega a tabela sem precisar remover manualmente a linha
               } else {
-                alert("Erro ao deletar o paciente.");
+                alert("Erro ao deletar paciente.");
               }
             });
           });
@@ -101,7 +101,7 @@
                     document.getElementById("telaedit").style.display = "none";
                     carregarPacientes();
                   } else {
-                    alert("Erro ao atualizar o paciente.");
+                    alert("Erro ao atualizar paciente.");
                   }
                 };
               }
@@ -127,7 +127,7 @@
           <th>Idade</th>
           <th>Genero</th>
           <th>Telefone</th>
-          <th>Já Fumou?</th>
+          <th>É fumante?</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -165,9 +165,7 @@
             <select id="genero" name="genero" required>
               <option value="Masculino">Masculino</option>
               <option value="Feminino">Feminino</option>
-              <option value="Binario">Binário</option>
               <option value="NãoBinario">Não Binário</option>
-              <option value="Transgenero">Transgênero</option>
             </select>
           </p>
           <p>
@@ -177,7 +175,7 @@
             </label>
           </p>
           <p>
-            <label>Já Fumou?</label>
+            <label>É fumante?</label>
             <input
               type="radio"
               name="smoker"

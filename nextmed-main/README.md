@@ -38,7 +38,6 @@ Instale my-project com npm
 
 
 ## Autores
-
 - [@Pedro Almeida](https://www.github.com/pedr0almd)
 - [@Vitória Alejandra](https://www.github.com/vitoria-bandeira)
 - [@Daniela Pereira](https://www.github.com/pdanib)

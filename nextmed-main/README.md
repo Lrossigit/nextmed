@@ -10,7 +10,7 @@ Aplicação web para auxiliar hospitais no precesso de triagem / cadastro de nov
 
 ## Documentação
 
-[Documentação](https://link-da-documentação)
+[Documentação](https://fatecspgov-my.sharepoint.com/:w:/g/personal/daniela_bosco_fatec_sp_gov_br/EdqW-fFPQ-BArttgnOpHblQB5evzE3kzWLozbAGnjg5fxg?e=ueQwZS)
 
 
 ## Instalação
@@ -18,9 +18,8 @@ Aplicação web para auxiliar hospitais no precesso de triagem / cadastro de nov
 Instale nextmed com npm
 
 ```bash
-  npm i
+  npm install
   npm start
-  pesquisar no navegador: "localhost:3000"
 ```
     
 ## Stack utilizada

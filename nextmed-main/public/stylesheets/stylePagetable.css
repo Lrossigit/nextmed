@@ -19,6 +19,26 @@ h2 {
   font-size: 24px;
 }
 
+.form-group {
+  display: flex;
+  align-items: center;
+}
+
+#search {
+  width: 250px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #d0e0f0;
+  background-color: #e8f1fc;
+  font-size: 14px;
+  color: #043873;
+}
+
+#search:focus {
+  border-color: #0b468a;
+  background-color: #e0ebff;
+}
+
 table {
   width: 80%;
   margin: 20px auto;
@@ -29,9 +49,9 @@ table {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
+th,
+td {
   padding: 12px;
-  text-align: left;
 }
 
 th {
@@ -58,6 +78,16 @@ td button:hover {
   background-color: #043873;
 }
 
+td .delete-btn {
+  background-color: #ffffff00;
+  color: #043873;
+  transition: 0.3s;
+}
+
+td .delete-btn:hover {
+  background-color: #aaa9a9;
+}
+
 button {
   background-color: #043873;
   color: white;
@@ -70,7 +100,9 @@ button {
 }
 
 button:hover {
-  background-color: #0b468a;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: "1000";
 }
 
 #telaedit {
@@ -92,7 +124,8 @@ button:hover {
   align-items: center;
 }
 
-input, select {
+input,
+select {
   padding: 10px;
   margin: 5px;
   width: 90%;
@@ -100,7 +133,7 @@ input, select {
   border: 1px solid #ddd;
 }
 
-input[type="submit"] {
+input[type='submit'] {
   background-color: #043873;
   color: white;
   border: none;
@@ -109,6 +142,6 @@ input[type="submit"] {
   cursor: pointer;
 }
 
-input[type="submit"]:hover {
+input[type='submit']:hover {
   background-color: #0b468a;
 }

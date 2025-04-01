@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www \n🚀 Servidor iniciado em http://localhost:3000 \n Caso precise pular a etapa de login, utilize http://localhost:3000/pagetable"
+ 
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

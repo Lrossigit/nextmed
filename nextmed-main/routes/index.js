@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const db = require("../db")
 const app = express(); 
 const path = require('path'); 
@@ -9,6 +10,11 @@ const {Editar} = require('../db');
 
 require('dotenv').config();
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.static('public'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 app.set('view engine', 'ejs'); 
 

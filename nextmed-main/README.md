@@ -15,26 +15,26 @@ Aplicação web para auxiliar hospitais no precesso de triagem / cadastro de nov
 
 ## Instalação
 
-Instale my-project com npm
+Instale nextmed com npm
 
 ```bash
   npm i
   npm start
+  pesquisar no navegador: "localhost:3000"
 ```
     
 ## Stack utilizada
 
-**Front-end:** React.js, TailwindCSS
+**Front-end:** Embedded JavaScript, CSS
 
 **Back-end:** Node, Express
 
 
 ## Screenshots
 
-![App Screenshot](https://i.ibb.co/Y4Y3LK2G/login.png)
-![App Screenshot](https://i.ibb.co/zh3YmhN0/menu.png)
-![App Screenshot](https://i.ibb.co/C35pgv3T/ver-todos.png)
-![App Screenshot](https://i.ibb.co/zWGRcRxx/cadastrar.png)
+![App Screenshot](https://i.ibb.co/cSXfM7wR/6.png)
+![App Screenshot](https://i.ibb.co/HTbJbZnv/7.png)
+![App Screenshot](https://i.ibb.co/d4L4dVdN/8.png)
 
 
 ## Autores

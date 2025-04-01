@@ -6,7 +6,7 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color: #5b94aa;
 }
 
 #telaedit {
@@ -15,7 +15,7 @@ a {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(124, 79, 79, 0.5);
   display: none; 
   justify-content: center;
   align-items: center;

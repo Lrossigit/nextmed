@@ -4,10 +4,19 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f8fbff;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-h1 {
-  color: #3a81f1;
+.logo {
+  margin-top: 20px;
+}
+
+h2 {
+  color: #0b468a;
+  font-size: 24px;
 }
 
 table {
@@ -17,21 +26,27 @@ table {
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
   padding: 12px;
-  border-bottom: 1px solid #ddd;
+  text-align: left;
 }
 
 th {
   background-color: #e3f0ff;
-  color: #3a81f1;
+  color: #0b468a;
+  font-weight: bold;
+}
+
+th:hover {
+  background-color: #0b468a;
+  color: white;
 }
 
 td button {
-  background-color: #3a81f1;
+  background-color: #0b468a;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -40,21 +55,22 @@ td button {
 }
 
 td button:hover {
-  background-color: #0056b3;
+  background-color: #043873;
 }
 
 button {
-  background-color: #3a81f1;
+  background-color: #043873;
   color: white;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  font-size: 16px;
+  margin-top: 15px;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #0b468a;
 }
 
 #telaedit {
@@ -67,6 +83,7 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   display: none;
+  width: 40%;
 }
 
 .form {
@@ -76,9 +93,22 @@ button:hover {
 }
 
 input, select {
-  padding: 8px;
+  padding: 10px;
   margin: 5px;
-  width: 80%;
+  width: 90%;
   border-radius: 5px;
   border: 1px solid #ddd;
+}
+
+input[type="submit"] {
+  background-color: #043873;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: #0b468a;
 }

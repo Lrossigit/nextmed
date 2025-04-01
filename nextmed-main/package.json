@@ -15,5 +15,10 @@
     "http-errors": "~1.6.3",
     "mongodb": "^6.15.0",
     "morgan": "~1.9.1"
-  }
+  },
+  "description": "![Logo](https://i.ibb.co/dw5WbnMq/Logo2.png)",
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

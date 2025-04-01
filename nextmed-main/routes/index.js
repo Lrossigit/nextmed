@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const db = require("../db")
 const app = express(); 
 const path = require('path'); 
@@ -10,11 +9,6 @@ const {Editar} = require('../db');
 
 require('dotenv').config();
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(express.static('public'));
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static('public'));
 
 app.set('view engine', 'ejs'); 
 
@@ -63,25 +57,20 @@ router.get('/api/pacientes', async (req, res) => {
 router.post('/login', async (req, res) => {
   const db = await connect();
   const { email, password } = req.body;
-  
   if (!email || !password) {
     return res.render('index', { erro: 'Preencha todos os campos para acessar!' });
   }
-
   try {
     const collection = db.collection('meneger');
     const adm = await collection.findOne({ email: email.trim() });
-
     if (!adm) {
       return res.render('index', { erro: 'E-mail inválido, tente novamente!' });
     }    
     const senhacerta = await bcrypt.compare(password, adm.password);
-    
     if (!senhacerta) {
       return res.render('index', { erro: 'Senha inválida, tente novamente!' });
     }
     res.redirect('/pagetable');
-    
   } catch (error) {
     res.status(500).send('Erro interno no servidor');
   }
@@ -101,7 +90,7 @@ router.post('/login', async (req, res) => {
     const mesAtual = hoje.getMonth() + 1;
         const diaAtual = hoje.getDate();
         if (mesAtual < mes || (mesAtual === mes && diaAtual < dia)) {
-            idade--;
+            age--;
         }
         paciente.age = age;
     }

@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="styleLog.css">
-  </head>
-  <body>
-    <img src="" alt="">
-    <h1>Faça Login</h1>
+    <link rel="stylesheet" href="/stylesheets/styleLog.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="/imgs/logo.svg" alt="NextMed Logo">
+        </div>
+        <div class="formulario">
+            <h2>Login</h2>
+            <form action="/login" method="POST">
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" required>
 
-    <form action="/login" method="POST">
-      <label>Email:</label>
-      <input type="email" name="email" required />
-      
-      <label>Senha:</label>
-      <input type="password" name="password" required />
-  
-      <input type="submit" value="Entrar">
-  </form>
-      <label>
-        <input type="checkbox" />
-        Lembrar de mim
-      </label>
-  </form>
+                <label for="password">Senha:</label>
+                <input type="password" name="password" id="password" required>
 
-  <button onclick="window.location.href='/Recoverpass'"> Esqueci a senha </button>
-  <button onclick="window.location.href='/createaccount'"> Cadatre-se </button>
+                <input type="submit" value="Entrar">
+            </form>
+            <label>
+                <input type="checkbox"> Lembrar de mim
+            </label>
 
-  </body>
+            <button onclick="window.location.href='/Recoverpass'">Esqueci a senha</button>
+            <button onclick="window.location.href='/createaccount'">Cadastre-se</button>
+        </div>
+    </div>
+</body>
 </html>

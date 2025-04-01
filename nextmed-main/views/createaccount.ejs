@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styleCriarconta.css">
+    <link rel="stylesheet" href="/stylesheets/styleCriarconta.css">
     <title>Crie sua conta</title>
 </head>
 <body>
-    
-        <h1>Criar uma nova conta</h1>
+    <div class="container">
+        <div class="logo">
+            <img src="/imgs/logo.svg" alt="NextMed Logo">
+        </div>
+        <div class="formulario">
+            <h2>Criar nova conta</h2>
+            <form action="/registro" method="POST">
+                <label for="email">E-mail:</label>
+                <input type="text" name="email" id="email" required>
 
-        <form action="/registro" method="POST">
-            <p>
-              <label>
-                E-mail:
-                <input type="text" name="email" />
-              </label>
-            </p>
-            <p>
-                <label>Senha
-                <input type="password" name="password" placeholder="Crie uma senha" />
-                <input type="password" name="password" placeholder="Repita a senha" />
-              <input type="submit" value="Criar" />
-            </label>
-            </p>
-          </form>
+                <label for="password">Senha:</label>
+                <input type="password" name="password" placeholder="Crie uma senha" required>
+                <input type="password" name="password_repeat" placeholder="Repita a senha" required>
+
+                <input type="submit" value="Criar Conta">
+            </form>
+        </div>
+    </div>
 </body>
 </html>

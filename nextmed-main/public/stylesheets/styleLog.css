@@ -2,17 +2,42 @@
 
 body {
   background-color: #f8fbff;
-  color: #2d72d9;
+  color: #043873;
   font-family: Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  flex-direction: column;
+  margin: 0;
 }
 
-h1 {
-  margin-bottom: 20px;
+.container {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  margin-right: 40px;
+}
+
+.logo img {
+  height: 60px;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h2 {
+  font-weight: bolder;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
 form {
@@ -28,48 +53,50 @@ form {
 label {
   font-weight: bold;
   margin-top: 10px;
-  color: #2d72d9;
+  color: #043873;
 }
 
 input[type="email"],
 input[type="password"] {
-  width: 200px;
+  width: 250px;
   padding: 10px;
   margin-top: 5px;
   border-radius: 5px;
   border: 1px solid #d0e0f0;
   background-color: #e8f1fc;
   font-size: 14px;
-  color: #2d72d9;
+  color: #043873;
 }
 
 input[type="submit"] {
-  background-color: #2d72d9;
+  background-color: #043873;
   color: white;
-  padding: 10px 20px;
+  padding: 10px;
   margin-top: 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  transition: 0.3s;
 }
 
 input[type="submit"]:hover {
-  background-color: #1e5bb8;
+  background-color: #0b468a;
 }
 
 button {
   background-color: transparent;
-  color: #2d72d9;
-  border: 1px solid #2d72d9;
+  color: #043873;
+  border: 1px solid #043873;
   padding: 10px;
   margin-top: 10px;
   cursor: pointer;
   border-radius: 5px;
   font-size: 14px;
+  transition: 0.3s;
 }
 
 button:hover {
-  background-color: #2d72d9;
+  background-color: #043873;
   color: white;
 }

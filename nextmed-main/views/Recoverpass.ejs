@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styleRecoverpass.css">
     <title>Recuperar Senha</title>
+    <link rel="stylesheet" href="/stylesheets/styleRecoverpass.css">
 </head>
 <body>
-
+    <div class="container">
+        <div class="logo">
+            <img src="/imgs/logo.svg" alt="NextMed Logo">
+        </div>
+        <div class="formulario">
             <h1>Recupere sua conta</h1>
-
             <form action="recover" method="POST">
-                <p>
-                  <label>
-                    E-mail:
-                    <input type="text" name="E-mail" />
-                  </label>
-                    <label>Senha
-                    <input type="password" placeholder="Digite sua nova senha" />
-                    <input type="password" placeholder="Repita a senha" />
-                  <input type="submit" value="Enviar" />
-                </label>
-                </p>
-              </form>
+                <label for="email">E-mail:</label>
+                <input type="text" name="E-mail" id="email" required>
+
+                <label for="nova-senha">Nova Senha:</label>
+                <input type="password" id="nova-senha" placeholder="Digite sua nova senha" required>
+                <input type="password" placeholder="Repita a senha" required>
+
+                <input type="submit" value="Enviar">
+            </form>
+        </div>
+    </div>
 </body>
 </html>

@@ -7,6 +7,16 @@
 Aplicação web para auxiliar hospitais no precesso de triagem / cadastro de novos pacientes.
 
 
+## Funcionalidades
+
+- Cadastro de usuário administrador, utilizando e-mail e senha
+- Login
+- Botão de limpar dados no login
+- Recuperar senha (Em desenvolvimento)
+- Cadastro de pacientes
+- Listagem de pacientes cadastrados
+- Possibilidade de edição e exclusão de dados do paciente
+
 
 ## Documentação
 

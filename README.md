@@ -16,12 +16,15 @@ Aplicação web para auxiliar hospitais no precesso de triagem / cadastro de nov
 - Cadastro de pacientes
 - Listagem de pacientes cadastrados
 - Possibilidade de edição e exclusão de dados do paciente
+  /// Novas Funcionalidades:
+- Agendamento de consultas
+- Área de gerenciamento exclusiva para médicos
 
-
-## Documentação
-
-[Documentação](https://fatecspgov-my.sharepoint.com/:w:/g/personal/daniela_bosco_fatec_sp_gov_br/EdqW-fFPQ-BArttgnOpHblQB5evzE3kzWLozbAGnjg5fxg?e=ueQwZS)
-
+## Requisitos para rodar
+Qualquer máquina com:
+- 4GB RAM
+- Processador: 1 Processador Intel® Core™ i3-5350H ou superior
+- Acesso a Internet
 
 ## Instalação
 
@@ -50,9 +53,9 @@ Instale nextmed com npm
 - [@Pedro Almeida](https://www.github.com/pedr0almd)
 - [@Vitória Alejandra](https://www.github.com/vitoria-bandeira)
 - [@Daniela Pereira](https://www.github.com/pdanib)
-- [@Welber](https://www.github.com/wjr154)
+- [@Welber Eugenio](https://www.github.com/wjr154)
 - [@Lucas Rossi](https://www.github.com/lrossigit)
-- [@Ryan](https://www.github.com/R7aNR)
+- [@Ryan Ribeiro](https://www.github.com/R7aNR)
 
 
 

@@ -115,7 +115,12 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   display: none;
-  width: 40%;
+  width: 30%;
+  width: 90vw;         
+  max-width: 600px;    
+  max-height: 90vh;    
+  overflow-y: auto;
+  z-index: 1000; 
 }
 
 .form {

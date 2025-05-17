@@ -74,3 +74,19 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-color: #0b468a;
 }
+
+.btn-voltar {
+  background-color: #1864bb;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+  margin: 15px;
+}
+
+.btn-voltar:hover{
+  background-color: #04264d;
+}

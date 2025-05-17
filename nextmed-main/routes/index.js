@@ -44,6 +44,18 @@ router.get('/Recoverpass', (req, res) => {
   res.render('Recoverpass'); 
 });
 
+router.get('/ListaEspera', (req, res) => {
+  res.render('ListaEspera'); 
+});
+
+router.get('/pageDoctor', (req, res) => {
+  res.render('pageDoctor'); 
+});
+
+router.get('/Triagem', (req, res) => {
+  res.render('Triagem'); 
+});
+
 router.get('/api/pacientes', async (req, res) => {
   try {
     const result = await db.Find(); 
@@ -78,9 +90,6 @@ router.post('/login', async (req, res) => {
 
   router.post("/save", async (req,res)=>{
     const paciente = req.body;
-    if (paciente.birth) {
-      paciente.birth = paciente.birth.split("-").reverse().join("/");
-  }
   if (paciente.birth) {
     const [dia, mes, ano] = paciente.birth.split("/");
     const dataNascimento = new Date(`${ano}-${mes}-${dia}`);
@@ -108,6 +117,7 @@ router.post('/login', async (req, res) => {
     }
   });
 
+  //Arrmar aqui - delete não funcionando
   router.post("/delete", async (req,res)=>{
     const id = req.body.id;
     try {
@@ -124,36 +134,46 @@ router.post('/login', async (req, res) => {
   });
 
   router.post("/edit", async (req, res) => {
-    const { id, name, CPF, birth, genero, fonenumber, smoker, age } = req.body;
-
+    const { id, name, CPF, birth, genero, fonenumber, smoker } = req.body;
+  
     try {
-        let age = null;
-        if (birth) {
-            const [ano, mes, dia] = birth.split("-");
-            const dataNascimento = new Date(`${ano}-${mes}-${dia}`);
-            const hoje = new Date();
-
-            age = hoje.getFullYear() - dataNascimento.getFullYear();
-            if (
-                hoje.getMonth() + 1 < parseInt(mes) ||
-                (hoje.getMonth() + 1 === parseInt(mes) && hoje.getDate() < parseInt(dia))
-            ) {
-                age--;
-            }
-            age = Number(age); 
+      let age = null;
+  
+      if (birth) {
+        const birthBR = birth.split("-").reverse().join("/");
+  
+        const [dia, mes, ano] = birthBR.split("/");
+  
+        const dataNascimento = new Date(`${ano}-${mes}-${dia}`);
+        const hoje = new Date();
+  
+        age = hoje.getFullYear() - dataNascimento.getFullYear();
+  
+        const mesAtual = hoje.getMonth() + 1;
+        const diaAtual = hoje.getDate();
+  
+        if (
+          mesAtual < Number(mes) || 
+          (mesAtual === Number(mes) && diaAtual < Number(dia))
+        ) {
+          age--;
         }
-        const result = await Editar(id, name, CPF, birth, genero, fonenumber, smoker, age);
-
-        if (result.modifiedCount > 0) { 
-            res.json({ success: true });
-        } else {
-            res.status(400).json({ success: false, message: "Nenhuma alteração realizada." });
-        }
+  
+        age = Number(age);
+      }
+  
+      const result = await Editar(id, name, CPF, birth, genero, fonenumber, smoker, age);
+  
+      if (result.modifiedCount > 0) {
+        res.json({ success: true });
+      } else {
+        res.status(400).json({ success: false, message: "Nenhuma alteração realizada." });
+      }
     } catch (error) {
-        console.error("Erro ao editar paciente:", error);
-        res.status(500).json({ success: false, message: "Erro interno no servidor." });
+      console.error("Erro ao editar paciente:", error);
+      res.status(500).json({ success: false, message: "Erro interno no servidor." });
     }
-});
+  });
 
   router.post("/registro", async (req, res) => {
     const db = await connect();

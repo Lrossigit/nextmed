@@ -1,95 +1,145 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require("../db")
-const app = express(); 
-const path = require('path'); 
-const bodyParser = require('body-parser'); 
-const {connect} = require('../db');
-const {Editar} = require('../db');
+const db = require("../db");
+const app = express();
+const path = require("path");
+const bodyParser = require("body-parser");
+const { connect } = require("../db");
+const { Editar } = require("../db");
+const bcrypt = require("bcrypt");
 
-require('dotenv').config();
+require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.set('view engine', 'ejs'); 
+app.set("view engine", "ejs");
 
-app.set('views', path.join(__dirname, 'views'));
+app.set("views", path.join(__dirname, "views"));
 
-const bcrypt = require ('bcrypt');
-
-router.get('/login', (req,res) => {
-  res.render('index');
-})
-
-router.get('/', (req, res) => {
-  res.render('index');
-});  
-
-router.get('/pagetable', (req, res) => {
-  res.render('pagetable'); 
+router.get("/login", (req, res) => {
+  res.render("index");
 });
 
-router.get('/AddUser', (req, res) => {
-  res.render('AddUser'); 
+router.get("/", (req, res) => {
+  res.render("index");
 });
 
-router.get('/createaccount', (req, res) => {
-  res.render('createaccount'); 
+router.get("/pagetable", (req, res) => {
+  res.render("pagetable");
 });
 
-router.get('/pagetable', async (req, res) => {
-  res.render('pagetable'); 
+router.get("/AddUser", (req, res) => {
+  res.render("AddUser");
 });
 
-router.get('/Recoverpass', (req, res) => {
-  res.render('Recoverpass'); 
+router.get("/createadmin", (req, res) => {
+  res.render("createadmin");
 });
 
-router.get('/ListaEspera', (req, res) => {
-  res.render('ListaEspera'); 
+router.get("/createnurse", (req, res) => {
+  res.render("createnurse");
 });
 
-router.get('/pageDoctor', (req, res) => {
-  res.render('pageDoctor'); 
+router.get("/createdoctor", (req, res) => {
+  res.render("createdoctor");
 });
 
-router.get('/Triagem', (req, res) => {
-  res.render('Triagem'); 
+router.get("/pagetable", async (req, res) => {
+  res.render("pagetable");
 });
 
-router.get('/api/pacientes', async (req, res) => {
+router.get("/Recoverpass", (req, res) => {
+  res.render("Recoverpass");
+});
+
+router.get("/formtriagem", (req, res) => {
+  res.render("formtriagem");
+});
+
+router.get("/pageDoctor", (req, res) => {
+  res.render("pageDoctor");
+});
+
+router.get("/atendDoctor", (req, res) => {
+  res.render("atendDoctor");
+});
+
+router.get("/Triagem", (req, res) => {
+  res.render("Triagem");
+});
+
+router.get("/api/pacientes", async (req, res) => {
   try {
-    const result = await db.Find(); 
-    res.json(result); 
+    const result = await db.Find();
+    res.json(result);
   } catch (error) {
     console.error("Erro ao buscar pacientes:", error);
     res.status(500).json({ error: "Erro ao buscar pacientes." });
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   const db = await connect();
   const { email, password } = req.body;
+
   if (!email || !password) {
-    return res.render('index', { erro: 'Preencha todos os campos para acessar!' });
+    return res.status(400).send("Email e senha são obrigatórios.");
   }
+
   try {
-    const collection = db.collection('meneger');
-    const adm = await collection.findOne({ email: email.trim() });
-    if (!adm) {
-      return res.render('index', { erro: 'E-mail inválido, tente novamente!' });
-    }    
-    const senhacerta = await bcrypt.compare(password, adm.password);
-    if (!senhacerta) {
-      return res.render('index', { erro: 'Senha inválida, tente novamente!' });
+
+    const colecoes = [
+      { nome: 'meneger', destino: '/pagetable' },
+      { nome: 'doctor', destino: '/pageDoctor' },
+      { nome: 'nurse', destino: '/Triagem' }
+    ];
+
+    let usuarioEncontrado = null;
+    let tipoUsuario = null;
+    let redirecionarPara = null;
+
+    for (const c of colecoes) {
+      const collection = db.collection(c.nome);
+      const usuario = await collection.findOne({ email: email.trim() });
+
+      if (usuario) {
+        const senhaCorreta = await bcrypt.compare(password, usuario.password);
+        if (senhaCorreta) {
+          usuarioEncontrado = usuario;
+          tipoUsuario = c.tipo;
+          redirecionarPara = c.destino;
+          break; 
+        }
+      }
     }
-    res.redirect('/pagetable');
+
+    if (!usuarioEncontrado) {
+      return res.status(401).send("Email ou senha inválidos.");
+    }
+
+    req.session.usuario = {
+      email: usuarioEncontrado.email,
+      nome: usuarioEncontrado.nome
+    };
+
+    return res.redirect(redirecionarPara);
+
   } catch (error) {
-    res.status(500).send('Erro interno no servidor');
+    console.error("Erro no login:", error);
+    return res.status(500).send("Erro interno no servidor.");
   }
 });
 
-  router.post("/save", async (req,res)=>{
-    const paciente = req.body;
+router.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Erro ao encerrar sessão:", err);
+    }
+    res.redirect('/login'); // ou para a sua rota de login real
+  });
+});
+
+router.post("/save", async (req, res) => {
+  const paciente = req.body;
   if (paciente.birth) {
     const [dia, mes, ano] = paciente.birth.split("/");
     const dataNascimento = new Date(`${ano}-${mes}-${dia}`);
@@ -97,144 +147,268 @@ router.post('/login', async (req, res) => {
     let age = hoje.getFullYear() - dataNascimento.getFullYear();
 
     const mesAtual = hoje.getMonth() + 1;
-        const diaAtual = hoje.getDate();
-        if (mesAtual < mes || (mesAtual === mes && diaAtual < dia)) {
-            age--;
-        }
-        paciente.age = age;
+    const diaAtual = hoje.getDate();
+    if (mesAtual < mes || (mesAtual === mes && diaAtual < dia)) {
+      age--;
     }
-    try {
-      const result = await db.Inserir(paciente);
-  
-      if (result) {
-        res.redirect('/pagetable');
-      } else {
-        res.status(500).send("Erro ao salvar o paciente.");
-      }
-    } catch (error) {
-      console.error("Erro ao salvar paciente:", error);
+    paciente.age = age;
+  }
+  try {
+    const result = await db.Inserir(paciente);
+
+    if (result) {
+      res.redirect("/pagetable");
+    } else {
       res.status(500).send("Erro ao salvar o paciente.");
     }
-  });
+  } catch (error) {
+    console.error("Erro ao salvar paciente:", error);
+    res.status(500).send("Erro ao salvar o paciente.");
+  }
+});
 
-  //Arrmar aqui - delete não funcionando
-  router.post("/delete", async (req,res)=>{
-    const id = req.body.id;
-    try {
-      const result = await db.Remover(id);
-      if (result.deletedCount > 0) { 
-        return res.json({ success: true });
-      } else {
-        return res.json({ success: false, message: 'Paciente não encontrado' });
-      }
-    } catch (error) {
-      console.error('Erro ao remover paciente:', error);
-      return res.json({ success: false, message: 'Erro ao deletar paciente' });
+router.post("/delete", async (req, res) => {
+  const id = req.body.id;
+  try {
+    const result = await db.Remover(id);
+    if (result.deletedCount > 0) {
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false, message: "Paciente não encontrado" });
     }
-  });
+  } catch (error) {
+    console.error("Erro ao remover paciente:", error);
+    return res.json({ success: false, message: "Erro ao deletar paciente" });
+  }
+});
 
-  router.post("/edit", async (req, res) => {
-    const { id, name, CPF, birth, genero, fonenumber, smoker } = req.body;
-  
-    try {
-      let age = null;
-  
-      if (birth) {
-        const birthBR = birth.split("-").reverse().join("/");
-  
-        const [dia, mes, ano] = birthBR.split("/");
-  
-        const dataNascimento = new Date(`${ano}-${mes}-${dia}`);
-        const hoje = new Date();
-  
-        age = hoje.getFullYear() - dataNascimento.getFullYear();
-  
-        const mesAtual = hoje.getMonth() + 1;
-        const diaAtual = hoje.getDate();
-  
-        if (
-          mesAtual < Number(mes) || 
-          (mesAtual === Number(mes) && diaAtual < Number(dia))
-        ) {
-          age--;
-        }
-  
-        age = Number(age);
-      }
-  
-      const result = await Editar(id, name, CPF, birth, genero, fonenumber, smoker, age);
-  
-      if (result.modifiedCount > 0) {
-        res.json({ success: true });
-      } else {
-        res.status(400).json({ success: false, message: "Nenhuma alteração realizada." });
-      }
-    } catch (error) {
-      console.error("Erro ao editar paciente:", error);
-      res.status(500).json({ success: false, message: "Erro interno no servidor." });
-    }
-  });
+router.post("/edit", async (req, res) => {
+  const { id, name, CPF, birth, genero, fonenumber, smoker } = req.body;
 
-  router.post("/registro", async (req, res) => {
-    const db = await connect();
-    const { email, password } = req.body;
-    console.log('Email recebido:', email);
-    console.log('Senha recebida:', password);
-    
-    const senhaUsuario = Array.isArray(password) ? password[0] : password;
-  
-    if (!email || !senhaUsuario) {
-      return res.status(400).send('Preencha todos os campos!');
+  try {
+    let age = null;
+
+    if (birth) {
+      const birthBR = birth.split("-").reverse().join("/");
+
+      const [dia, mes, ano] = birthBR.split("/");
+
+      const dataNascimento = new Date(`${ano}-${mes}-${dia}`);
+      const hoje = new Date();
+
+      age = hoje.getFullYear() - dataNascimento.getFullYear();
+
+      const mesAtual = hoje.getMonth() + 1;
+      const diaAtual = hoje.getDate();
+
+      if (
+        mesAtual < Number(mes) ||
+        (mesAtual === Number(mes) && diaAtual < Number(dia))
+      ) {
+        age--;
+      }
+
+      age = Number(age);
     }
-    try {
-      const saltRounds = 10;
-      
-      const hashedPassword = await bcrypt.hash(senhaUsuario, saltRounds);
-      console.log('Senha criptografada:', hashedPassword);
-      
-      const collection = db.collection('meneger');
-      await collection.insertOne({
-        email: email.trim(),
-        password: hashedPassword
+
+    const result = await Editar(
+      id,
+      name,
+      CPF,
+      birth,
+      genero,
+      fonenumber,
+      smoker,
+      age
+    );
+
+    if (result.modifiedCount > 0) {
+      res.json({ success: true });
+    } else {
+      res
+        .status(400)
+        .json({ success: false, message: "Nenhuma alteração realizada." });
+    }
+  } catch (error) {
+    console.error("Erro ao editar paciente:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Erro interno no servidor." });
+  }
+});
+
+router.post("/registro", async (req, res) => {
+  const db = await connect();
+  const { email, password } = req.body;
+  console.log("Email recebido:", email);
+  console.log("Senha recebida:", password);
+
+  const senhaUsuario = Array.isArray(password) ? password[0] : password;
+
+  if (!email || !senhaUsuario) {
+    return res.status(400).send("Preencha todos os campos!");
+  }
+  try {
+    const saltRounds = 10;
+
+    const hashedPassword = await bcrypt.hash(senhaUsuario, saltRounds);
+    console.log("Senha criptografada:", hashedPassword);
+
+    const collection = db.collection("meneger");
+    await collection.insertOne({
+      email: email.trim(),
+      password: hashedPassword,
+    });
+    res.redirect("/login");
+  } catch (error) {
+    console.error("Erro ao criar usuário", error);
+    res.status(500).send("Erro interno no servidor");
+  }
+});
+
+//registro doutor
+router.post("/registrodoctor", async (req, res) => {
+  const db = await connect();
+  const {
+    nome,
+    birth,
+    cpf,
+    fonenumber,
+    crm,
+    specialty,
+    email,
+    password,
+    password_repeat,
+  } = req.body;
+
+  // Validação inicial
+  if (
+    !nome ||
+    !birth ||
+    !cpf ||
+    !fonenumber ||
+    !crm ||
+    !specialty ||
+    !email ||
+    !password ||
+    !password_repeat
+  ) {
+    return res.status(400).send("Todos os campos são obrigatórios.");
+  }
+
+  if (password !== password_repeat) {
+    return res.status(400).send("As senhas não coincidem.");
+  }
+
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const collection = db.collection("doctor"); // Você pode mudar o nome da coleção, se desejar
+
+    await collection.insertOne({
+      nome: nome.trim(),
+      birth,
+      cpf,
+      fonenumber,
+      crm: crm.trim(),
+      specialty: specialty.trim(),
+      email: email.trim(),
+      password: hashedPassword,
+    });
+
+    res.redirect("/login");
+  } catch (error) {
+    console.error("Erro ao registrar médico:", error);
+    res.status(500).send("Erro interno no servidor.");
+  }
+});
+
+//registro infermeira
+router.post("/registronurse", async (req, res) => {
+  const db = await connect();
+  const {
+    nome,
+    birth,
+    cpf,
+    fonenumber,
+    email,
+    password,
+    password_repeat
+  } = req.body;
+
+  if (!nome || !birth || !cpf || !fonenumber || !email || !password || !password_repeat) {
+    return res.status(400).send('Todos os campos são obrigatórios.');
+  }
+
+  if (password !== password_repeat) {
+    return res.status(400).send('As senhas não coincidem.');
+  }
+
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const collection = db.collection('nurse'); // ou 'enfermeiras' se quiser separação
+
+    await collection.insertOne({
+      nome: nome.trim(),
+      birth,
+      cpf,
+      fonenumber,
+      email: email.trim(),
+      password: hashedPassword
+    });
+
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Erro ao registrar enfermeira:', error);
+    res.status(500).send('Erro interno no servidor.');
+  }
+});
+
+router.post("/recover", async (req, res) => {
+  const db = await connect(); // Conecta ao banco
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Preencha todos os campos!" });
+  }
+
+  try {
+    const collection = db.collection("meneger");
+
+    const user = await collection.findOne({ email: email.trim() });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "E-mail não encontrado!" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Nova senha criptografada:", hashedPassword);
+
+    const result = await collection.updateOne(
+      { email: email.trim() },
+      { $set: { password: hashedPassword } }
+    );
+    if (result.modifiedCount > 0) {
+      return res.json({
+        success: true,
+        message: "Senha alterada com sucesso!",
       });
-      res.redirect('/login');
-    } catch (error) {
-      console.error('Erro ao criar usuário', error);
-      res.status(500).send('Erro interno no servidor');
+    } else {
+      return res
+        .status(500)
+        .json({ success: false, message: "Erro ao atualizar senha!" });
     }
-  });
-
-  router.post("/recover", async (req, res) => {
-    const db = await connect(); // Conecta ao banco
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ success: false, message: "Preencha todos os campos!" });
-    }
-
-    try {
-        const collection = db.collection("meneger");
-
-        const user = await collection.findOne({ email: email.trim() });
-        if (!user) {
-            return res.status(404).json({ success: false, message: "E-mail não encontrado!" });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("Nova senha criptografada:", hashedPassword);
-
-        const result = await collection.updateOne(
-            { email: email.trim() }, 
-            { $set: { password: hashedPassword } }
-        );
-        if (result.modifiedCount > 0) {
-            return res.json({ success: true, message: "Senha alterada com sucesso!" });
-        } else {
-            return res.status(500).json({ success: false, message: "Erro ao atualizar senha!" });
-        }
-    } catch (error) {
-        console.error("Erro ao atualizar senha:", error);
-        return res.status(500).json({ success: false, message: "Erro interno do servidor!" });
-    }
+  } catch (error) {
+    console.error("Erro ao atualizar senha:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Erro interno do servidor!" });
+  }
 });
 
 module.exports = router;

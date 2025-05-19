@@ -150,3 +150,24 @@ input[type='submit'] {
 input[type='submit']:hover {
   background-color: #0b468a;
 }
+
+.logout-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.logout-button {
+  padding: 8px 16px;
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e74c3c;
+}

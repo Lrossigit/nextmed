@@ -1,11 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triagem</title>
+  <link rel="stylesheet" href="../public/stylesheets/styletriagem.css">
+  <script>
+ window.onload = function () {
+    
+    const dados = JSON.parse(sessionStorage.getItem("dadosPaciente"));
+    if (dados) {
+      document.getElementById("nome").value = dados.nome || "";
+      document.getElementById("cpf").value = dados.cpf || "";
+      document.getElementById("idade").value = dados.idade || "";
+      document.getElementById("acompanhante").value = dados.acompanhante || "";
+      document.getElementById("companhia").value = dados.companhia || "";
+    } else {
+      alert("Dados do paciente não encontrados.");
+    }
+
+    const agora = new Date();
+    const data = agora.toISOString().split('T')[0];
+    const horas = agora.getHours().toString().padStart(2, '0');
+    const minutos = agora.getMinutes().toString().padStart(2, '0');
+
+    document.getElementById("Dchegada").value = data;
+    document.getElementById("Htriagem").value = `${horas}:${minutos}`;
+
+    // Configurar evento de envio do formulário
+    document.getElementById("conformtriagem").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const form = document.getElementById("conformtriagem");
+      const formData = new FormData(form);
+
+      try {
+        const resposta = await fetch("/triagem/finalizar", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (resposta.ok) {
+          alert("Formulário enviado com sucesso!");
+          window.location.href = "/Triagem";
+        } else {
+          console.log("Status da resposta:", resposta.status);
+          alert("Erro ao enviar o formulário.");
+        }
+      } catch (error) {
+        alert("Erro na conexão com o servidor.");
+        console.error(error);
+      }
+    });
+  };
+  </script>
 </head>
 <body>
-    <p>Lista de espera para os pascientes acompanharem</p>
+  <h2>Informações Clínicas</h2>
+  <form action="/triagem/finalizar" method="post" id="conformtriagem">
+    <label>Nome:
+      <input type="text" id="nome" name="name" readonly />
+    </label>
+    <label>CPF:
+      <input type="text" id="cpf" name="cpf" readonly />
+    </label>
+    <label>Idade:
+      <input type="text" id="idade" name="age" readonly />
+    </label>
+    <label>Acompanhante:
+      <input type="text" id="acompanhante" name="acompanhante" readonly />
+    </label>
+    <label>Companhia:
+      <input type="text" id="companhia" name="companhia" readonly />
+    </label>
+    <br>
+    <label>Frequencia Cardiaca:
+      <input type="text" name="Fcardiaca" id="Fcardiaca"/>
+    </label>
+    <label>Temperatura:
+      <input type="text" name="temperatura" id="temperatura"/>
+    </label>
+    <label>Pressão Arterial:
+      <input type="text" name="pressao" id="pressao"/>
+    </label>
+    <label>Saturação de O2:
+        <input type="text" name="saturacao" id="saturacao"/>
+      </label>
+    <h2>Informações Clinicas</h2>
+    <label>Queixa Principal:
+        <input type="text" name="queixa" id="queixa"/>
+      </label>
+      <label>Histórico Médico:
+        <input type="text" name="Hmedico" id="Hmedico"/>
+      </label>
+      <label>Inicio dos Sintomas:
+        <input type="date" name="inicioS" id="inicioS"/>
+      </label>
+      <label>Uso de medicações Continuas:
+        <input type="text" name="Usomedicacao" id="Usomedicacao"/>
+      </label>
+      <label>Alergia medicamentosas:
+        <input type="text" name="alergia" id="alergia"/>
+      </label>
+      <label>Nivel de Dor:
+        <input type="text" name="niveldor" id="niveldor"/>
+      </label>
+      <h2>Classificação</h2>
+      <label for="Classificação">Classificação de Risco</label>
+            <select id="Risco" name="Risco" required>
+              <option value="" disabled selected>Selecione</option>
+              <option value="Emergencia">Emergencia</option>
+              <option value="Muito Urgente">Muito Urgente</option>
+              <option value="Urgente">Urgente</option>
+              <option value="Pouco Urgente">Pouco Urgente</option>
+              <option value="Não urgente">Não urgente</option>
+            </select>
+        <label>Justificativa:
+            <input type="text" name="justificativa" id="justificativa"/>
+        </label>
+
+    <h2>Dados operacionais</h2>
+
+    <label>Data da Triagem:
+        <input type="text" name="Dchegada" id="Dchegada"/>
+      </label>
+      <label>Hora da Triagem:
+        <input type="text" name="Htriagem" id="Htriagem"/>
+      </label>
+      <label>Profissional Responsavel:
+        <input type="text" name="profissional" id="profissional"/>
+      </label>
+      <label>Encaminhamento:
+        <input type="text" name="encaminhamento" id="encaminhamento"/>
+      </label>
+
+
+    <button type="submit">Finalizar Triagem</button>
+    <button onclick="window.location.href='/Triagem'">Voltar</button>
+  </form>
 </body>
 </html>

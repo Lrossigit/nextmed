@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 const { connect } = require("../db");
 const { Editar } = require("../db");
 const bcrypt = require("bcrypt");
+const { ObjectId } = require('mongodb');
+const multer = require ("multer");
+const upload = multer();
 
 require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -408,6 +411,141 @@ router.post("/recover", async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Erro interno do servidor!" });
+  }
+});
+
+router.get('/api/ultimo-paciente', async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection('pacient');
+
+    const ultimoPaciente = await collection.find().sort({ _id: -1 }).limit(1).toArray();
+
+    if (ultimoPaciente.length > 0) {
+      res.json(ultimoPaciente[0]);
+    } else {
+      res.status(404).json({ erro: "Nenhum paciente encontrado." });
+    }
+  } catch (error) {
+    console.error("Erro ao buscar paciente:", error);
+    res.status(500).json({ erro: "Erro ao buscar paciente." });
+  }
+});
+
+
+router.get('/api/paciente', async (req, res) => {
+  const cpf = req.query.cpf;
+  if (!cpf) {
+    return res.status(400).json({ erro: "CPF não informado." });
+  }
+
+  try {
+    const db = await connect();
+    const collection = db.collection('pacient');
+
+    const paciente = await collection.findOne({ CPF: cpf });
+    if (paciente) {
+      res.json(paciente);
+    } else {
+      res.status(404).json({ erro: "Paciente não encontrado." });
+    }
+  } catch (error) {
+    console.error("Erro ao buscar paciente por CPF:", error);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+router.get('/api/proximo-paciente', async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection('pacient');
+    const ultimoPacienteId = req.query.excluir;
+
+    const filtro = ultimoPacienteId
+      ? { _id: { $ne: new ObjectId(ultimoPacienteId) } }
+      : {};
+
+    const proximo = await collection.find(filtro).sort({ _id: -1 }).toArray();
+
+    if (proximo.length === 0) {
+      return res.status(204).send(); 
+    }
+
+    res.json(proximo[0]);
+  } catch (error) {
+    console.error("Erro ao buscar próximo paciente:", error);
+    res.status(500).send("Erro ao buscar próximo paciente");
+  }
+});
+
+app.post("/triagem", (req, res) => {
+  const { name, cpf, age, companhia } = req.body;
+  res.render("/formtriagem", { name, cpf, age, companhia });
+});
+
+router.post('/triagem/finalizar', upload.none(), async (req, res) => {
+  try {
+    const db = await connect();
+    const {
+      name,
+      cpf,
+      age,
+      acompanhante,
+      companhia,
+      Fcardiaca,
+      temperatura,
+      pressao,
+      saturacao,
+      queixa,
+      Hmedico,
+      inicioS,
+      Usomedicacao,
+      alergia,
+      niveldor,
+      Risco,
+      justificativa,
+      DHchegada,
+      Htriagem,
+      profissional,
+      encaminhamento
+    } = req.body;
+
+    if (!name || !cpf || !age) {
+      return res.status(400).send('Nome, CPF e Idade são obrigatórios.');
+    }
+
+    const collection = db.collection('triage'); 
+
+    await collection.insertOne({
+      name,
+      cpf,
+      age,
+      acompanhante,
+      companhia,
+      Fcardiaca,
+      temperatura,
+      pressao,
+      saturacao,
+      queixa,
+      Hmedico,
+      inicioS,
+      Usomedicacao,
+      alergia,
+      niveldor,
+      Risco,
+      justificativa,
+      DHchegada,
+      Htriagem,
+      profissional,
+      encaminhamento,
+      status: "pendente"
+    });
+
+    res.redirect('/Triagem');
+
+  } catch (error) {
+    console.error('Erro ao salvar triagem:', error);
+    res.status(500).send('Erro interno no servidor.');
   }
 });
 

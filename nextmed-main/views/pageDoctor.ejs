@@ -1,24 +1,152 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina Inicial</title>
-</head>
-<body>
-    <div class="container-navbar">
-    <nav>
-        <div class="logo">
-            <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pagina Inicial</title>
+        <link rel="stylesheet" href="">
+        <script>
+            let triagemAtualId = null;
+            let liberado = false;
+
+            async function carregarUltimaTriagem() {
+        try {
+            const resposta = await fetch("/api/ultima-triagem");
+            const triagem = await resposta.json();
+
+            document.getElementById("Name").value = triagem.Name || "";
+            document.getElementById("Age").value = triagem.Age || "";
+            document.getElementById("CPF").value = triagem.CPF || "";
+            document.getElementById("Acompanhante").value = triagem.Acompanhante || "";
+            document.getElementById("Companhia").value = triagem.Companhia || "";
+            document.getElementById("Risco").value = triagem.Risco || "";
+
+            triagemAtualId = triagem._id;
+            liberado = false;
+
+            atualizarCamposTriagem(triagem);
+            liberado = false;
+
+            const botao = document.getElementById("btnOutraConsulta");
+            botao.disabled = true;
+            botao.style.opacity = "0.5";
+
+            setTimeout(() => {
+            liberado = true;
+            botao.disabled = false;
+            botao.style.opacity = "1";
+            }, 20 * 1000);
+        } catch (error) {
+            alert("Erro ao carregar a triagem.");
+            console.error(error);
+        }
+        }
+
+
+        
+        function atualizarCamposTriagem(triagem) {
+            document.getElementById("Name").value = triagem.Name || "";
+            document.getElementById("Age").value = triagem.Age || "";
+            document.getElementById("CPF").value = triagem.CPF || "";
+            document.getElementById("Acompanhante").value = triagem.Acompanhante || "";
+            document.getElementById("Companhia").value = triagem.Companhia || "";
+            document.getElementById("Risco").value = triagem.Risco || "";
+            triagemAtualId = triagem._id;
+    }
+
+    function configurarBotaoOutraConsulta() {
+  const botao = document.getElementById("btnOutraConsulta");
+
+  botao.addEventListener("click", async () => {
+    if (!liberado) return;
+
+    try {
+      const resposta = await fetch(`/api/proxima-triagem?excluir=${triagemAtualId}`);
+
+      if (resposta.status === 204) {
+        alert("Nenhuma triagem disponível no momento.");
+        return;
+      }
+
+      const novaTriagem = await resposta.json();
+      atualizarCamposTriagem(novaTriagem);
+
+      liberado = false;
+      botao.disabled = true;
+      botao.style.opacity = "0.5";
+
+      setTimeout(() => {
+        liberado = true;
+        botao.disabled = false;
+        botao.style.opacity = "1";
+      }, 60 * 1000);
+    } catch (error) {
+      alert("Erro ao buscar a próxima triagem.");
+      console.error(error);
+    }
+  });
+    }
+
+      function iniciarConsulta() {
+      const triagem = {
+        Name: document.getElementById("Name").value,
+        CPF: document.getElementById("CPF").value,
+        Age: document.getElementById("Age").value,
+        Companhia: document.getElementById("Companhia").value
+      };
+
+      sessionStorage.setItem("dadosTriagem", JSON.stringify(triagem));
+      window.location.href = "/atendDoctor";
+    }
+        window.onload = () => {
+            carregarUltimaTriagem();
+            configurarBotaoOutraConsulta();
+        };
+        </script>
+    </head>
+    <body>
+        <div class="container-navbar">
+        <nav>
+            <div class="logo">
+                <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+            </div>
+            <div class="logout-conteiner">
+                <form action="/logout" method="POST">
+                <button type="submit" class="logout-btn">Sair</button>
+                </form>
+                <h1>Olá Doutor!</h1>
+            </div>
+        </nav>
         </div>
-        <div class="logout-conteiner">
-            <form action="/logout" method="POST">
-            <button type="submit" class="logout-btn">Sair</button>
-            </form>
+        <form action="formConsulta" method="post">
+            <h2>Aguarde o paciente</h2>
+            <label>Nome:
+            <input type="text" id="Name" readonly />
+            </label>
+            <label>Idade:
+            <input type="text" id="Age" readonly />
+            </label>
+            <label>CPF:
+            <input type="text" id="CPF" readonly />
+            </label>
+            <br><br>
+            <label>Possui acompanhante?</label>
+            <input type="text" id="Acompanhante" name="acompanhante" readonly />
+            <br><br>
+            <label>Acompanhante:
+            <input type="text" id="Companhia" readonly />
+            </label>
+            <br><br>
+            <label for="Classificação">Classificação de Risco: </label>
+            <input type="text" id="Risco" name="Risco" required />
+            <br><br>
+        </form>
         </div>
-    </nav>
-    </div>
-    
-      <p>tela para o médico assumir o atendimento </p>
-</body>
-</html>
+        <div class="btn-group">
+        <button id="btnConsulta" onclick="iniciarConsulta()">Iniciar Consulta</button>
+        <button id="btnOutraConsulta">Iniciar outra consulta</button>
+        <button type="button" onclick="window.location.href='/consultationtable'">Histórico de consultas</button>
+        </div>
+        </form>
+    </body>
+    </html>

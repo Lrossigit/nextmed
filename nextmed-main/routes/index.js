@@ -26,10 +26,6 @@ router.get("/", (req, res) => {
   res.render("index");
 });
 
-router.get("/pagetable", (req, res) => {
-  res.render("pagetable");
-});
-
 router.get("/AddUser", (req, res) => {
   res.render("AddUser");
 });
@@ -68,6 +64,18 @@ router.get("/atendDoctor", (req, res) => {
 
 router.get("/Triagem", (req, res) => {
   res.render("Triagem");
+});
+
+router.get("/showtriage", (req, res) => {
+  res.render("showtriage");
+});
+
+router.get("/consultationtable", (req, res) => {
+  res.render("consultationtable");
+});
+
+router.get("/triagetable", (req, res) => {
+  res.render("triagetable");
 });
 
 router.get("/api/pacientes", async (req, res) => {
@@ -371,46 +379,43 @@ router.post("/registronurse", async (req, res) => {
 });
 
 router.post("/recover", async (req, res) => {
-  const db = await connect(); // Conecta ao banco
+  const db = await connect(); 
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Preencha todos os campos!" });
+    return res.status(400).json({ success: false, message: "Preencha todos os campos!" });
   }
 
   try {
-    const collection = db.collection("meneger");
-
-    const user = await collection.findOne({ email: email.trim() });
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "E-mail não encontrado!" });
-    }
+    const colecoes = ["meneger", "doctor", "nurse"];
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("Nova senha criptografada:", hashedPassword);
 
-    const result = await collection.updateOne(
-      { email: email.trim() },
-      { $set: { password: hashedPassword } }
-    );
-    if (result.modifiedCount > 0) {
-      return res.json({
-        success: true,
-        message: "Senha alterada com sucesso!",
-      });
-    } else {
-      return res
-        .status(500)
-        .json({ success: false, message: "Erro ao atualizar senha!" });
+    for (const nomeColecao of colecoes) {
+      const collection = db.collection(nomeColecao);
+
+      const user = await collection.findOne({ email: email.trim() });
+      if (user) {
+        const result = await collection.updateOne(
+          { email: email.trim() },
+          { $set: { password: hashedPassword } }
+        );
+
+        if (result.modifiedCount > 0) {
+          return res.json({
+            success: true,
+            message: `Senha alterada com sucesso para usuário da coleção '${nomeColecao}'!`,
+          });
+        } else {
+          return res.status(500).json({ success: false, message: "Erro ao atualizar senha!" });
+        }
+      }
     }
+
+    return res.status(404).json({ success: false, message: "E-mail não encontrado em nenhuma coleção!" });
+
   } catch (error) {
     console.error("Erro ao atualizar senha:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Erro interno do servidor!" });
+    return res.status(500).json({ success: false, message: "Erro interno do servidor!" });
   }
 });
 
@@ -461,17 +466,31 @@ router.get('/api/proximo-paciente', async (req, res) => {
     const collection = db.collection('pacient');
     const ultimoPacienteId = req.query.excluir;
 
-    const filtro = ultimoPacienteId
-      ? { _id: { $ne: new ObjectId(ultimoPacienteId) } }
-      : {};
+   
+    const pacientes = await collection.find().sort({ _id: 1 }).toArray();
 
-    const proximo = await collection.find(filtro).sort({ _id: -1 }).toArray();
-
-    if (proximo.length === 0) {
+    if (pacientes.length === 0) {
       return res.status(204).send(); 
     }
 
-    res.json(proximo[0]);
+    // Se nenhum ID foi informado, retorna o primeiro da lista
+    if (!ultimoPacienteId) {
+      return res.json(pacientes[0]);
+    }
+
+    // Encontrar o índice do último paciente visualizado
+    const indexAtual = pacientes.findIndex(p => p._id.toString() === ultimoPacienteId);
+
+    // Se o ID não for encontrado (ex: foi excluído), volta ao início
+    if (indexAtual === -1) {
+      return res.json(pacientes[0]);
+    }
+
+    // Avança para o próximo ou volta ao início
+    const proximoPaciente = pacientes[(indexAtual + 1) % pacientes.length];
+
+    res.json(proximoPaciente);
+
   } catch (error) {
     console.error("Erro ao buscar próximo paciente:", error);
     res.status(500).send("Erro ao buscar próximo paciente");
@@ -487,58 +506,59 @@ router.post('/triagem/finalizar', upload.none(), async (req, res) => {
   try {
     const db = await connect();
     const {
-      name,
-      cpf,
-      age,
-      acompanhante,
-      companhia,
-      Fcardiaca,
-      temperatura,
-      pressao,
-      saturacao,
-      queixa,
-      Hmedico,
-      inicioS,
-      Usomedicacao,
-      alergia,
-      niveldor,
+      Name,
+      CPF,
+      Age,
+      Acompanhante,
+      Companhia,
+      FrCardiaca,
+      Temperatura,
+      PressaoSang,
+      Saturacao,
+      Queixa,
+      HistMedico,
+      InicioSint,
+      UsoDeMedicacao,
+      AlergiaMed,
+      NivelDaDor,
       Risco,
-      justificativa,
-      DHchegada,
+      Justificativa,
+      DataChegada,
       Htriagem,
-      profissional,
-      encaminhamento
+      Profissional,
+      Encaminhamento
     } = req.body;
 
-    if (!name || !cpf || !age) {
+    if (!Name || !CPF || !Age) {
       return res.status(400).send('Nome, CPF e Idade são obrigatórios.');
     }
 
     const collection = db.collection('triage'); 
 
     await collection.insertOne({
-      name,
-      cpf,
-      age,
-      acompanhante,
-      companhia,
-      Fcardiaca,
-      temperatura,
-      pressao,
-      saturacao,
-      queixa,
-      Hmedico,
-      inicioS,
-      Usomedicacao,
-      alergia,
-      niveldor,
+      Name,
+      CPF,
+      Age,
+      Acompanhante,
+      Companhia,
+      FrCardiaca,
+      Temperatura,
+      PressaoSang,
+      Saturacao,
+      Queixa,
+      HistMedico,
+      InicioSint,
+      UsoDeMedicacao,
+      AlergiaMed,
+      NivelDaDor,
       Risco,
-      justificativa,
-      DHchegada,
+      Justificativa,
+      DataChegada,
       Htriagem,
-      profissional,
-      encaminhamento,
-      status: "pendente"
+      Profissional,
+      Encaminhamento,
+      triage_status: "Aguardando consulta",
+      Consultório : null
     });
 
     res.redirect('/Triagem');
@@ -548,5 +568,219 @@ router.post('/triagem/finalizar', upload.none(), async (req, res) => {
     res.status(500).send('Erro interno no servidor.');
   }
 });
+
+router.get('/api/triagem', async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection('triage');
+
+    const triagem = await collection.find({ triage_status: ("pendente") });
+    if (triagem) {
+      res.json(triagem);
+    } else {
+      res.status(404).json({ erro: "Triagem não encontrada." });
+    }
+  } catch (error) {
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+router.get('/api/ultima-triagem', async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection('triage');
+
+    const ultimaTriagem = await collection.aggregate([
+      {
+        $match: { triage_status: "Aguardando consulta" }
+      },
+      {
+        $addFields: {
+          ordemRisco: {
+            $switch: {
+              branches: [
+                { case: { $eq: ["$Risco", "Emergencia"] }, then: 1 },
+                { case: { $eq: ["$Risco", "Muito Urgente"] }, then: 2 },
+                { case: { $eq: ["$Risco", "Urgente"] }, then: 3 },
+                { case: { $eq: ["$Risco", "Pouco Urgente"] }, then: 4 },
+                { case: { $eq: ["$Risco", "Não urgente"] }, then: 5 }
+              ],
+              default: 6
+            }
+          }
+        }
+      },
+      {
+        $sort: { ordemRisco: 1, _id: 1 } // mais urgente e mais antigo primeiro
+      },
+      {
+        $limit: 1
+      }
+    ]).toArray();
+
+    if (ultimaTriagem.length > 0) {
+      res.json(ultimaTriagem[0]);
+    } else {
+      res.status(404).json({ mensagem: "Nenhuma triagem pendente encontrada." });
+    }
+  } catch (error) {
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+router.get('/api/proxima-triagem', async (req, res) => {
+  try {
+    const db = await connect();
+    const collection = db.collection('triage');
+    const ultimaTriagemId = req.query.excluir;
+
+    const pacientes = await collection.aggregate([
+      { $match: { triage_status: "Aguardando consulta" } },
+      {
+        $addFields: {
+          ordemRisco: {
+            $switch: {
+              branches: [
+                { case: { $eq: ["$Risco", "Emergencia"] }, then: 1 },
+                { case: { $eq: ["$Risco", "Muito Urgente"] }, then: 2 },
+                { case: { $eq: ["$Risco", "Urgente"] }, then: 3 },
+                { case: { $eq: ["$Risco", "Pouco Urgente"] }, then: 4 },
+                { case: { $eq: ["$Risco", "Não urgente"] }, then: 5 }
+              ],
+              default: 6
+            }
+          }
+        }
+      },
+      { $sort: { ordemRisco: 1, _id: 1 } } 
+    ]).toArray();
+
+    if (pacientes.length === 0) {
+      return res.status(204).send(); 
+    }
+
+    if (!ultimaTriagemId) {
+      return res.json(pacientes[0]);
+    }
+
+    const indexAtual = pacientes.findIndex(p => p._id.toString() === ultimaTriagemId);
+
+    const proximoPaciente = pacientes[(indexAtual + 1) % pacientes.length];
+
+    res.json(proximoPaciente);
+    
+  } catch (error) {
+    console.error("Erro na rota /api/proxima-triagem:", error);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
+});
+
+router.post("/consulta/encaminhar", upload.none(), async (req, res) => {
+  try {
+    const db = await connect();
+    const {
+      Name,
+      CPF,
+      Age,
+      Companhia,
+      DataChegada,
+      Htriagem,
+      Profissional,
+      Queixa,
+      NivelDaDor,
+      Justificativa,
+      Diagnostico,
+      Medicamento,
+      Encaminhamento,
+      Obs
+    } = req.body;
+
+    if (!Name || !CPF || !Age) {
+      return res.status(400).send("Nome, CPF e Idade são obrigatórios.");
+    }
+
+    const collection = db.collection("consultation");
+    const collection2 = db.collection("triage")
+
+    await collection.insertOne({
+      Name,
+      CPF,
+      Age,
+      Companhia,
+      DataChegada,
+      Htriagem,
+      Profissional,
+      Queixa,
+      NivelDaDor,
+      Justificativa,
+      Diagnostico,
+      Medicamento,
+      Encaminhamento,
+      Obs,
+      dataConsulta: new Date(),
+    });
+
+    await collection2.updateOne(
+  { CPF: CPF },
+  { $set: { triage_status: "Consulta realizada" } },
+  { upsert: true }
+);
+
+    res.redirect("/pageDoctor");
+  } catch (error) {
+    console.error("Erro ao salvar consulta:", error);
+    res.status(500).send("Erro interno no servidor.");
+  }
+});
+
+router.get("/triagens/ativas", async (req, res) => {
+  try {
+    const db = await connect();
+    const triagens = await db.collection("triage")
+      .find({
+        triage_status: { $in: ["Aguardando consulta", "Em consulta", "Consulta realizada"] }
+      })
+      .toArray();
+    res.json(triagens);
+  } catch (error) {
+    console.error("Erro ao buscar triagens:", error);
+    res.status(500).send("Erro ao buscar triagens.");
+  }
+});
+
+router.post('/api/iniciar-consulta', async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ erro: "ID da triagem é obrigatório." });
+  }
+
+  try {
+    const db = await connect();
+    const collection = db.collection('triage');
+
+    const numeroAleatorio = Math.floor(Math.random() * 10) + 1;
+
+    const resultado = await collection.updateOne(
+        { _id: new ObjectId(id) },
+          {
+            $set: {
+                    triage_status: "Em consulta",
+                    Consultório: numeroAleatorio
+    }
+  }
+);
+
+    if (resultado.matchedCount === 0) {
+      return res.status(404).json({ erro: "Triagem não encontrada." });
+    }
+
+    res.json({ mensagem: "Status atualizado para 'Em consulta' com sucesso." });
+  } catch (erro) {
+    console.error(erro);
+    res.status(500).json({ erro: "Erro ao atualizar o status da triagem." });
+  }
+});
+
 
 module.exports = router;

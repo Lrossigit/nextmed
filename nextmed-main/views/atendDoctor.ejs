@@ -1,11 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atendimento</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atendimento</title>
+  <link rel="stylesheet" href="" />
+  <script>
+    async function carregarUltimaTriagem() {
+      try {
+        const resposta = await fetch("/api/ultima-triagem");
+        if (!resposta.ok) throw new Error("Resposta inválida");
+
+        const triagem = await resposta.json();
+
+        document.getElementById("Dchegada").value = triagem.DataChegada || "";
+        document.getElementById("Htriagem").value = triagem.Htriagem || "";
+        document.getElementById("Profissional").value = triagem.Profissional || "";
+        document.getElementById("Queixa").value = triagem.Queixa || "";
+        document.getElementById("NivelDor").value = triagem.NivelDaDor || "";
+        document.getElementById("Justificativa").value = triagem.Justificativa || "";
+
+
+        await fetch("/api/iniciar-consulta", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: triagem._id })
+    });
+
+    
+      } catch (error) {
+        alert("Erro ao carregar a triagem.");
+        console.error(error);
+      }
+    }
+
+    function carregarDadosSessionStorage() {
+      const dados = JSON.parse(sessionStorage.getItem("dadosTriagem"));
+      if (dados) {
+        document.getElementById("Name").value = dados.Name || "";
+        document.getElementById("CPF").value = dados.CPF || "";
+        document.getElementById("Age").value = dados.Age || "";
+        document.getElementById("Companhia").value = dados.Companhia || "";
+      } else {
+        alert("Dados da Triagem não encontrados.");
+      }
+    }
+
+    window.onload = () => {
+      carregarDadosSessionStorage();
+      carregarUltimaTriagem();
+
+      document.getElementById("confirmconsulta").addEventListener("submit", async function(event) {
+        event.preventDefault(); 
+
+        const formData = new FormData(this);
+
+        try {
+          const resposta = await fetch("/consulta/encaminhar", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (resposta.ok) {
+            alert("Formulário enviado com sucesso!");
+            window.location.href = "/pageDoctor";
+          } else {
+            console.log("Status da resposta:", resposta.status);
+            alert("Erro ao enviar o formulário.");
+          }
+        } catch (error) {
+          alert("Erro na conexão com o servidor.");
+          console.error(error);
+        }
+      });
+    };
+  </script>
 </head>
 <body>
-    
+  <div class="container-navbar">
+    <nav>
+      <div class="logo">
+        <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+      </div>
+      <div class="logout-conteiner">
+        <form action="/logout" method="POST">
+          <button type="submit" class="logout-btn">Sair</button>
+        </form>
+      </div>
+    </nav>
+  </div>
+
+  <form action="/consulta/encaminhar" method="post" id="confirmconsulta">
+    <h2>Dados da Triagem</h2>
+    <label>Nome:
+      <input type="text" id="Name" name="Name" readonly />
+    </label>
+    <label>Idade:
+      <input type="text" id="Age" name="Age" readonly />
+    </label>
+    <label>CPF:
+      <input type="text" id="CPF" name="CPF" readonly />
+    </label>
+
+    <label>Acompanhante:
+      <input type="text" id="Companhia" name="Companhia" readonly />
+    </label>
+    <label>Data da Triagem:
+      <input type="text" id="Dchegada" name="DataChegada" readonly />
+    </label>
+    <br /><br />
+    <label>Hora da Triagem:
+      <input type="text" id="Htriagem" name="Htriagem" readonly />
+    </label>
+    <label>Profissional Responsável:
+      <input type="text" id="Profissional" name="Profissional" readonly />
+    </label>
+
+    <label>Queixa:
+      <input type="text" id="Queixa" name="Queixa" readonly />
+    </label>
+    <br /><br />
+    <label>Nível da dor:
+      <input type="text" id="NivelDor" name="NivelDaDor" readonly />
+    </label>
+    <label>Justificativa:
+      <input type="text" id="Justificativa" name="Justificativa" readonly />
+    </label>
+
+    <h2>Diagnóstico</h2>
+
+    <label>Descrição do Diagnóstico:
+      <input type="text" id="Diagnóstico" name="Diagnostico" />
+    </label>
+    <label>Medicamento Receitado:
+      <input type="text" id="Medicamento" name="Medicamento" />
+    </label>
+    <br /><br />
+    <label>Encaminhamento (Se necessário):
+      <input type="text" id="Encaminhamento" name="Encaminhamento" />
+    </label>
+    <label>Observações:
+      <input type="text" id="Obs" name="Obs" />
+    </label>
+
+    <button type="submit">Finalizar Consulta</button>
+    <button type="button" onclick="window.location.href='/pageDoctor'">Voltar</button>
+  </form>
 </body>
 </html>

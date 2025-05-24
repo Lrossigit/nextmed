@@ -110,18 +110,30 @@
     window.onload = () => {
       carregarUltimoPaciente();
       configurarBotaoOutroPaciente();
-    };
+      const user = JSON.parse(sessionStorage.getItem("usuarioLogado"));
+    if (user) {
+      document.getElementById("user-name").textContent = user.nome || "Usuário";
+      document.getElementById("user-email").textContent = user.email || "email@exemplo.com";
+    }};
   </script>
 </head>
 <body>
+  <div class="navbar">
   <div class="logo">
     <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
-    <div class="logout-conteiner">
-      <form action="/logout" method="POST">
-        <button type="submit" class="logout-btn">Sair</button>
-      </form>
-    </div>
   </div>
+
+  <div class="user-info">
+    <span id="user-name"></span>
+    <span id="user-email"></span>
+  </div>
+
+  <div class="logout-container">
+    <form action="/logout" method="POST">
+      <button type="submit" class="logout-btn">Sair</button>
+    </form>
+  </div>
+</div>
 
   <div class="container_triage">
     <h2>Aguarde o paciente</h2>
@@ -171,6 +183,7 @@
     <div class="btn-group">
       <button id="btnTriagem" onclick="iniciarTriagem()">Iniciar Triagem</button>
       <button id="btnOutroPaciente">Chamar Outro Paciente</button>
+      <button type="button" onclick="window.location.href='/triagetable'">Histórico de triagens</button>
     </div>
   </div>
 </body>

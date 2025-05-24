@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triagem</title>
-  <link rel="stylesheet" href="../public/stylesheets/styletriagem.css">
+  <title>Preenchendo Triagem</title>
+  <link rel="stylesheet" href="/stylesheets/styletriagem.css">
   <script>
- window.onload = function () {
+  let abaTriagens;
+
+  window.onload = function () {
     
     const dados = JSON.parse(sessionStorage.getItem("dadosPaciente"));
     if (dados) {
-      document.getElementById("nome").value = dados.nome || "";
-      document.getElementById("cpf").value = dados.cpf || "";
-      document.getElementById("idade").value = dados.idade || "";
-      document.getElementById("acompanhante").value = dados.acompanhante || "";
-      document.getElementById("companhia").value = dados.companhia || "";
+      document.getElementById("Name").value = dados.nome || "";
+      document.getElementById("CPF").value = dados.cpf || "";
+      document.getElementById("Age").value = dados.idade || "";
+      document.getElementById("Acompanhante").value = dados.acompanhante || "";
+      document.getElementById("Companhia").value = dados.companhia || "";
     } else {
       alert("Dados do paciente não encontrados.");
     }
@@ -24,12 +26,14 @@
     const horas = agora.getHours().toString().padStart(2, '0');
     const minutos = agora.getMinutes().toString().padStart(2, '0');
 
-    document.getElementById("Dchegada").value = data;
+    document.getElementById("DataChegada").value = data;
     document.getElementById("Htriagem").value = `${horas}:${minutos}`;
 
-    // Configurar evento de envio do formulário
+    // Envia o formulário
     document.getElementById("conformtriagem").addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      abaTriagens = window.open("/showtriage", "AbaTriagens");
 
       const form = document.getElementById("conformtriagem");
       const formData = new FormData(form);
@@ -53,90 +57,103 @@
       }
     });
   };
-  </script>
+</script>
+
 </head>
 <body>
+  <div class="container-navbar">
+        <nav>
+            <div class="logo">
+                <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+            </div>
+            <div class="logout-conteiner">
+                <form action="/logout" method="POST">
+                <button type="submit" class="logout-btn">Sair</button>
+                </form>
+            </div>
+        </nav>
+        </div>
   <h2>Informações Clínicas</h2>
   <form action="/triagem/finalizar" method="post" id="conformtriagem">
     <label>Nome:
-      <input type="text" id="nome" name="name" readonly />
+      <input type="text" id="Name" name="Name" readonly />
     </label>
     <label>CPF:
-      <input type="text" id="cpf" name="cpf" readonly />
+      <input type="text" id="CPF" name="CPF" readonly />
     </label>
     <label>Idade:
-      <input type="text" id="idade" name="age" readonly />
+      <input type="text" id="Age" name="Age" readonly />
     </label>
     <label>Acompanhante:
-      <input type="text" id="acompanhante" name="acompanhante" readonly />
+      <input type="text" id="Acompanhante" name="Acompanhante" readonly />
     </label>
     <label>Companhia:
-      <input type="text" id="companhia" name="companhia" readonly />
+      <input type="text" id="Companhia" name="Companhia" readonly />
     </label>
     <br>
-    <label>Frequencia Cardiaca:
-      <input type="text" name="Fcardiaca" id="Fcardiaca"/>
+    <label>Frequência Cardíaca:
+      <input type="text" id="FrCardiaca" name="FrCardiaca" required />
     </label>
     <label>Temperatura:
-      <input type="text" name="temperatura" id="temperatura"/>
+      <input type="text" id="Temperatura" name="Temperatura" required />
     </label>
     <label>Pressão Arterial:
-      <input type="text" name="pressao" id="pressao"/>
+      <input type="text" id="PressaoSang" name="PressaoSang" required />
     </label>
     <label>Saturação de O2:
-        <input type="text" name="saturacao" id="saturacao"/>
-      </label>
-    <h2>Informações Clinicas</h2>
+      <input type="text" id="Saturacao" name="Saturacao" required />
+    </label>
+    
+    <h2>Informações Clínicas</h2>
     <label>Queixa Principal:
-        <input type="text" name="queixa" id="queixa"/>
-      </label>
-      <label>Histórico Médico:
-        <input type="text" name="Hmedico" id="Hmedico"/>
-      </label>
-      <label>Inicio dos Sintomas:
-        <input type="date" name="inicioS" id="inicioS"/>
-      </label>
-      <label>Uso de medicações Continuas:
-        <input type="text" name="Usomedicacao" id="Usomedicacao"/>
-      </label>
-      <label>Alergia medicamentosas:
-        <input type="text" name="alergia" id="alergia"/>
-      </label>
-      <label>Nivel de Dor:
-        <input type="text" name="niveldor" id="niveldor"/>
-      </label>
-      <h2>Classificação</h2>
-      <label for="Classificação">Classificação de Risco</label>
-            <select id="Risco" name="Risco" required>
-              <option value="" disabled selected>Selecione</option>
-              <option value="Emergencia">Emergencia</option>
-              <option value="Muito Urgente">Muito Urgente</option>
-              <option value="Urgente">Urgente</option>
-              <option value="Pouco Urgente">Pouco Urgente</option>
-              <option value="Não urgente">Não urgente</option>
-            </select>
-        <label>Justificativa:
-            <input type="text" name="justificativa" id="justificativa"/>
-        </label>
+      <input type="text" id="Queixa" name="Queixa" required />
+    </label>
+    <label>Histórico Médico:
+      <input type="text" id="HistMedico" name="HistMedico" required />
+    </label>
+    <label>Início dos Sintomas:
+      <input type="date" id="InicioSint" name="InicioSint" required />
+    </label>
+    <label>Uso de Medicações Contínuas:
+      <input type="text" id="UsoDeMedicacao" name="UsoDeMedicacao" />
+    </label>
+    <label>Alergia Medicamentosa:
+      <input type="text" id="AlergiaMed" name="AlergiaMed" />
+    </label>
+    <label>Nível de Dor:
+      <input type="text" id="NivelDaDor" name="NivelDaDor" />
+    </label>
+    
+    <h2>Classificação</h2>
+    <label for="Classificação">Classificação de Risco</label>
+    <select id="Risco" name="Risco" required>
+      <option value="" disabled selected>Selecione</option>
+      <option value="Emergencia">Emergência</option>
+      <option value="Muito Urgente">Muito Urgente</option>
+      <option value="Urgente">Urgente</option>
+      <option value="Pouco Urgente">Pouco Urgente</option>
+      <option value="Não urgente">Não urgente</option>
+    </select>
+    <label>Justificativa:
+      <input type="text" id="Justificativa" name="Justificativa" required />
+    </label>
 
-    <h2>Dados operacionais</h2>
-
+    <h2>Dados Operacionais</h2>
     <label>Data da Triagem:
-        <input type="text" name="Dchegada" id="Dchegada"/>
-      </label>
-      <label>Hora da Triagem:
-        <input type="text" name="Htriagem" id="Htriagem"/>
-      </label>
-      <label>Profissional Responsavel:
-        <input type="text" name="profissional" id="profissional"/>
-      </label>
-      <label>Encaminhamento:
-        <input type="text" name="encaminhamento" id="encaminhamento"/>
-      </label>
-
+      <input type="text" id="DataChegada" name="DataChegada" readonly />
+    </label>
+    <label>Hora da Triagem:
+      <input type="time" id="Htriagem" name="Htriagem" readonly />
+    </label>
+    <label>Profissional Responsável:
+      <input type="text" id="Profissional" name="Profissional"  />
+    </label>
+    <label>Encaminhamento:
+      <input type="text" id="Encaminhamento" name="Encaminhamento" />
+    </label>
 
     <button type="submit">Finalizar Triagem</button>
-    <button onclick="window.location.href='/Triagem'">Voltar</button>
+    <button type="button" onclick="window.location.href='/Triagem'">Voltar</button>
   </form>
 </body>
 </html>

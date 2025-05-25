@@ -23,10 +23,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ✅ CONFIGURAR SESSÃO ANTES DAS ROTAS
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'chave-padrao',
+  secret: 'algumSegredoSecretoAqui',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // true somente se estiver com HTTPS
+  cookie: {
+    secure: false,  
+    maxAge: 24 * 60 * 60 * 1000 
+  }
 }));
 
 // ✅ ROTAS VÊM DEPOIS DA SESSÃO

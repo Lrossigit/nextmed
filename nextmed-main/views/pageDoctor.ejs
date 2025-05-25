@@ -9,12 +9,28 @@
             let triagemAtualId = null;
             let liberado = false;
 
+            async function carregarNomeUsuario() {
+  try {
+    const resposta = await fetch('/api/usuario-logado', { credentials: 'include' });
+
+    if (!resposta.ok) {
+      throw new Error('Não autorizado');
+    }
+
+    const usuario = await resposta.json();
+    document.getElementById('nomeUsuario').textContent = `Olá, ${usuario.name}!`;
+
+  } catch (error) {
+    console.error('Erro ao carregar o nome do usuário:', error);
+  }
+}
+
             async function carregarUltimaTriagem() {
         try {
             const resposta = await fetch("/api/ultima-triagem");
             const triagem = await resposta.json();
 
-            document.getElementById("Name").value = triagem.Name || "";
+            document.getElementById("Pacient").value = triagem.Pacient || "";
             document.getElementById("Age").value = triagem.Age || "";
             document.getElementById("CPF").value = triagem.CPF || "";
             document.getElementById("Acompanhante").value = triagem.Acompanhante || "";
@@ -45,7 +61,7 @@
 
         
         function atualizarCamposTriagem(triagem) {
-            document.getElementById("Name").value = triagem.Name || "";
+            document.getElementById("Pacient").value = triagem.Pacient || "";
             document.getElementById("Age").value = triagem.Age || "";
             document.getElementById("CPF").value = triagem.CPF || "";
             document.getElementById("Acompanhante").value = triagem.Acompanhante || "";
@@ -89,7 +105,7 @@
 
       function iniciarConsulta() {
       const triagem = {
-        Name: document.getElementById("Name").value,
+        Pacient: document.getElementById("Pacient").value,
         CPF: document.getElementById("CPF").value,
         Age: document.getElementById("Age").value,
         Companhia: document.getElementById("Companhia").value
@@ -101,6 +117,7 @@
         window.onload = () => {
             carregarUltimaTriagem();
             configurarBotaoOutraConsulta();
+            carregarNomeUsuario();
         };
         </script>
     </head>
@@ -114,14 +131,14 @@
                 <form action="/logout" method="POST">
                 <button type="submit" class="logout-btn">Sair</button>
                 </form>
-                <h1>Olá Doutor!</h1>
+                <h1 id="nomeUsuario"></h1>
             </div>
         </nav>
         </div>
         <form action="formConsulta" method="post">
             <h2>Aguarde o paciente</h2>
             <label>Nome:
-            <input type="text" id="Name" readonly />
+            <input type="text" id="Pacient" readonly />
             </label>
             <label>Idade:
             <input type="text" id="Age" readonly />

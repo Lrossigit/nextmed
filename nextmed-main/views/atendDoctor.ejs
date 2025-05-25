@@ -6,6 +6,22 @@
   <title>Atendimento</title>
   <link rel="stylesheet" href="" />
   <script>
+
+    async function carregarDadosDoctor() {
+  try {
+    const resposta = await fetch('/api/usuario-logado');
+    if (!resposta.ok) throw new Error('Não autorizado');
+
+    const usuario = await resposta.json();
+
+    
+    document.getElementById('Doctor').value = usuario.name || '';
+    document.getElementById('CRM').value = usuario.crm || '';
+  } catch (error) {
+    console.error('Erro ao carregar dados do doctor:', error);
+  }
+}
+
     async function carregarUltimaTriagem() {
       try {
         const resposta = await fetch("/api/ultima-triagem");
@@ -15,7 +31,7 @@
 
         document.getElementById("Dchegada").value = triagem.DataChegada || "";
         document.getElementById("Htriagem").value = triagem.Htriagem || "";
-        document.getElementById("Profissional").value = triagem.Profissional || "";
+        document.getElementById("Nurse").value = triagem.Profissional || "";
         document.getElementById("Queixa").value = triagem.Queixa || "";
         document.getElementById("NivelDor").value = triagem.NivelDaDor || "";
         document.getElementById("Justificativa").value = triagem.Justificativa || "";
@@ -37,7 +53,7 @@
     function carregarDadosSessionStorage() {
       const dados = JSON.parse(sessionStorage.getItem("dadosTriagem"));
       if (dados) {
-        document.getElementById("Name").value = dados.Name || "";
+        document.getElementById("Pacient").value = dados.Pacient || "";
         document.getElementById("CPF").value = dados.CPF || "";
         document.getElementById("Age").value = dados.Age || "";
         document.getElementById("Companhia").value = dados.Companhia || "";
@@ -49,6 +65,7 @@
     window.onload = () => {
       carregarDadosSessionStorage();
       carregarUltimaTriagem();
+      carregarDadosDoctor();
 
       document.getElementById("confirmconsulta").addEventListener("submit", async function(event) {
         event.preventDefault(); 
@@ -93,7 +110,7 @@
   <form action="/consulta/encaminhar" method="post" id="confirmconsulta">
     <h2>Dados da Triagem</h2>
     <label>Nome:
-      <input type="text" id="Name" name="Name" readonly />
+      <input type="text" id="Pacient" name="Pacient" readonly />
     </label>
     <label>Idade:
       <input type="text" id="Age" name="Age" readonly />
@@ -113,7 +130,7 @@
       <input type="text" id="Htriagem" name="Htriagem" readonly />
     </label>
     <label>Profissional Responsável:
-      <input type="text" id="Profissional" name="Profissional" readonly />
+      <input type="text" id="Nurse" name="Nurse" readonly />
     </label>
 
     <label>Queixa:
@@ -125,6 +142,14 @@
     </label>
     <label>Justificativa:
       <input type="text" id="Justificativa" name="Justificativa" readonly />
+    </label>
+
+    <h2>Dados do Médico</h2>
+    <label>Nome do Doutor:
+    <input type="text" id="Doctor" name="Doctor" readonly />
+    </label>
+    <label>CRM do Doutor:
+    <input type="text" id="CRM" name="CRM" readonly />
     </label>
 
     <h2>Diagnóstico</h2>

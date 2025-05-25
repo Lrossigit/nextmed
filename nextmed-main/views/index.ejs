@@ -6,22 +6,60 @@
     <title>Login</title>
     <link rel="stylesheet" href="/stylesheets/styleLog.css" />
     <script>
-        function abrirPopup() {
-          document.getElementById('popupCadastro').style.display = 'block';
+      function abrirPopup() {
+        document.getElementById('popupCadastro').style.display = 'block';
+      }
+
+      function fecharPopup() {
+        document.getElementById('popupCadastro').style.display = 'none';
+      }
+
+      window.onclick = function (event) {
+        const popup = document.getElementById('popupCadastro');
+        if (event.target === popup) {
+          fecharPopup();
         }
-      
-        function fecharPopup() {
-          document.getElementById('popupCadastro').style.display = 'none';
-        }
-      
-        // Fecha o modal ao clicar fora dele
-        window.onclick = function(event) {
-          const popup = document.getElementById('popupCadastro');
-          if (event.target === popup) {
-            fecharPopup();
+      };
+
+      window.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('formLogin').addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+
+          try {
+            const response = await fetch('/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              alert(data.message || 'Erro no login');
+              return;
+            }
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('nome', data.nome);
+            localStorage.setItem('tipo', data.tipo);
+
+            if (data.tipo === 'doctor' && data.crm) {
+              localStorage.setItem('crm', data.crm);
+            }
+
+            window.location.href = data.destino;
+
+          } catch (err) {
+            alert('Erro ao conectar com o servidor');
           }
-        }
-      </script>
+        });
+      });
+    </script>
   </head>
   <body>
     <div class="container">
@@ -30,7 +68,7 @@
       </div>
       <div class="formulario">
         <h2>Login</h2>
-        <form action="/login" method="POST">
+        <form id="formLogin">
           <label for="email">Email:</label>
           <input type="email" name="email" id="email" required />
 
@@ -41,24 +79,16 @@
           <input type="reset" value="Limpar campos" />
         </form>
 
-        <button onclick="window.location.href='/Recoverpass'">
-          Esqueci a senha
-        </button>
+        <button onclick="window.location.href='/Recoverpass'">Esqueci a senha</button>
         <button onclick="abrirPopup()">Cadastre-se</button>
 
         <div id="popupCadastro" class="popup">
           <div class="popup-conteudo">
             <span class="fechar" onclick="fecharPopup()">&times;</span>
             <h3>Escolha o tipo de cadastro:</h3>
-            <button onclick="window.location.href='/createadmin'">
-              Admin
-            </button>
-            <button onclick="window.location.href='/createnurse'">
-              Enfermeira
-            </button>
-            <button onclick="window.location.href='/createdoctor'">
-              Médico
-            </button>
+            <button onclick="window.location.href='/createadmin'">Admin</button>
+            <button onclick="window.location.href='/createnurse'">Enfermeira</button>
+            <button onclick="window.location.href='/createdoctor'">Médico</button>
           </div>
         </div>
       </div>

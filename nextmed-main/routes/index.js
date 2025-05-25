@@ -10,6 +10,22 @@ const bcrypt = require("bcrypt");
 const { ObjectId } = require('mongodb');
 const multer = require ("multer");
 const upload = multer();
+const jwt = require('jsonwebtoken');
+const SECRET = 'seuSegredoJWT';
+const cors = require('cors');
+const session = require('express-session');
+
+app.use(session({
+  secret: 'seuSegredoAqui',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
+
+app.use(cors({
+  origin: 'http://localhost:3000', // seu domínio frontend
+  credentials: true
+}));
 
 require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -88,20 +104,39 @@ router.get("/api/pacientes", async (req, res) => {
   }
 });
 
+router.get("/api/consultation", async (req, res) => {
+  try {
+    const result = await db.Find();
+    res.json(result);
+  } catch (error) {
+    console.error("Erro ao buscar o histórico consultas:", error);
+    res.status(500).json({ error: "Erro ao buscar o histórico consultas." });
+  }
+});
+
+router.get("/api/triage", async (req, res) => {
+  try {
+    const result = await db.Find();
+    res.json(result);
+  } catch (error) {
+    console.error("Erro ao buscar o histórico de triagens:", error);
+    res.status(500).json({ error: "Erro ao buscar o histórico de triagens." });
+  }
+});
+
 router.post("/login", async (req, res) => {
   const db = await connect();
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send("Email e senha são obrigatórios.");
+    return res.status(400).json({ message: "Email e senha são obrigatórios." });
   }
 
   try {
-
     const colecoes = [
-      { nome: 'meneger', destino: '/pagetable' },
-      { nome: 'doctor', destino: '/pageDoctor' },
-      { nome: 'nurse', destino: '/Triagem' }
+      { name: "meneger", tipo: "admin", destino: "/pagetable" },
+      { name: "doctor", tipo: "doctor", destino: "/pageDoctor" },
+      { name: "nurse", tipo: "nurse", destino: "/Triagem" },
     ];
 
     let usuarioEncontrado = null;
@@ -109,7 +144,7 @@ router.post("/login", async (req, res) => {
     let redirecionarPara = null;
 
     for (const c of colecoes) {
-      const collection = db.collection(c.nome);
+      const collection = db.collection(c.name);
       const usuario = await collection.findOne({ email: email.trim() });
 
       if (usuario) {
@@ -118,26 +153,68 @@ router.post("/login", async (req, res) => {
           usuarioEncontrado = usuario;
           tipoUsuario = c.tipo;
           redirecionarPara = c.destino;
-          break; 
+          break;
         }
       }
     }
 
     if (!usuarioEncontrado) {
-      return res.status(401).send("Email ou senha inválidos.");
+      return res.status(401).json({ message: "Email ou senha inválidos." });
     }
 
-    req.session.usuario = {
-      email: usuarioEncontrado.email,
-      nome: usuarioEncontrado.nome
+    // Payload base para o token JWT
+    const payload = {
+      id: usuarioEncontrado._id,
+      name: usuarioEncontrado.name,
+      tipo: tipoUsuario
     };
 
-    return res.redirect(redirecionarPara);
+    if (tipoUsuario === "doctor" && usuarioEncontrado.crm) {
+      payload.crm = usuarioEncontrado.crm;
+    }
+
+    const token = jwt.sign(payload, SECRET, { expiresIn: "1h" });
+
+    // Salvar dados na sessão
+    req.session.usuario = {
+      id: usuarioEncontrado._id.toString(),
+      name: usuarioEncontrado.name,
+      email: usuarioEncontrado.email,
+      tipo: tipoUsuario,
+      crm: usuarioEncontrado.crm || null
+    };
+
+    req.session.save(err => {
+      if (err) {
+        console.error("Erro ao salvar sessão:", err);
+        return res.status(500).json({ message: "Erro interno ao salvar sessão." });
+      }
+
+      return res.json({
+        token,
+        name: usuarioEncontrado.name,
+        tipo: tipoUsuario,
+        destino: redirecionarPara
+      });
+    });
 
   } catch (error) {
     console.error("Erro no login:", error);
-    return res.status(500).send("Erro interno no servidor.");
+    return res.status(500).json({ message: "Erro interno no servidor." });
   }
+});
+
+
+router.get('/api/usuario-logado', (req, res) => {
+  if (!req.session.usuario) {
+    return res.status(401).send('Não autorizado');
+  }
+
+  res.json({
+    name: req.session.usuario.name,
+    email: req.session.usuario.email,
+    crm: req.session.usuario.crm || null
+  });
 });
 
 router.post('/logout', (req, res) => {
@@ -145,7 +222,7 @@ router.post('/logout', (req, res) => {
     if (err) {
       console.error("Erro ao encerrar sessão:", err);
     }
-    res.redirect('/login'); // ou para a sua rota de login real
+    res.redirect('/login'); 
   });
 });
 
@@ -281,7 +358,7 @@ router.post("/registro", async (req, res) => {
 router.post("/registrodoctor", async (req, res) => {
   const db = await connect();
   const {
-    nome,
+    name,
     birth,
     cpf,
     fonenumber,
@@ -294,7 +371,7 @@ router.post("/registrodoctor", async (req, res) => {
 
   // Validação inicial
   if (
-    !nome ||
+    !name ||
     !birth ||
     !cpf ||
     !fonenumber ||
@@ -318,7 +395,7 @@ router.post("/registrodoctor", async (req, res) => {
     const collection = db.collection("doctor"); // Você pode mudar o nome da coleção, se desejar
 
     await collection.insertOne({
-      nome: nome.trim(),
+      name: name.trim(),
       birth,
       cpf,
       fonenumber,
@@ -339,7 +416,7 @@ router.post("/registrodoctor", async (req, res) => {
 router.post("/registronurse", async (req, res) => {
   const db = await connect();
   const {
-    nome,
+    name,
     birth,
     cpf,
     fonenumber,
@@ -348,7 +425,7 @@ router.post("/registronurse", async (req, res) => {
     password_repeat
   } = req.body;
 
-  if (!nome || !birth || !cpf || !fonenumber || !email || !password || !password_repeat) {
+  if (!name || !birth || !cpf || !fonenumber || !email || !password || !password_repeat) {
     return res.status(400).send('Todos os campos são obrigatórios.');
   }
 
@@ -363,7 +440,7 @@ router.post("/registronurse", async (req, res) => {
     const collection = db.collection('nurse'); // ou 'enfermeiras' se quiser separação
 
     await collection.insertOne({
-      nome: nome.trim(),
+      name: name.trim(),
       birth,
       cpf,
       fonenumber,
@@ -506,7 +583,7 @@ router.post('/triagem/finalizar', upload.none(), async (req, res) => {
   try {
     const db = await connect();
     const {
-      Name,
+      Pacient,
       CPF,
       Age,
       Acompanhante,
@@ -529,14 +606,14 @@ router.post('/triagem/finalizar', upload.none(), async (req, res) => {
       Encaminhamento
     } = req.body;
 
-    if (!Name || !CPF || !Age) {
+    if (!Pacient || !CPF || !Age) {
       return res.status(400).send('Nome, CPF e Idade são obrigatórios.');
     }
 
     const collection = db.collection('triage'); 
 
     await collection.insertOne({
-      Name,
+      Pacient,
       CPF,
       Age,
       Acompanhante,
@@ -679,23 +756,25 @@ router.post("/consulta/encaminhar", upload.none(), async (req, res) => {
   try {
     const db = await connect();
     const {
-      Name,
+      Pacient,
       CPF,
       Age,
       Companhia,
       DataChegada,
       Htriagem,
-      Profissional,
+      Nurse,
       Queixa,
       NivelDaDor,
       Justificativa,
+      Doctor,
+      CRM,
       Diagnostico,
       Medicamento,
       Encaminhamento,
       Obs
     } = req.body;
 
-    if (!Name || !CPF || !Age) {
+    if (!Pacient || !CPF || !Age) {
       return res.status(400).send("Nome, CPF e Idade são obrigatórios.");
     }
 
@@ -703,16 +782,18 @@ router.post("/consulta/encaminhar", upload.none(), async (req, res) => {
     const collection2 = db.collection("triage")
 
     await collection.insertOne({
-      Name,
+      Pacient,
       CPF,
       Age,
       Companhia,
       DataChegada,
       Htriagem,
-      Profissional,
+      Nurse,
       Queixa,
       NivelDaDor,
       Justificativa,
+      Doctor,
+      CRM,
       Diagnostico,
       Medicamento,
       Encaminhamento,
@@ -781,6 +862,18 @@ router.post('/api/iniciar-consulta', async (req, res) => {
     res.status(500).json({ erro: "Erro ao atualizar o status da triagem." });
   }
 });
+
+router.get("/consultas/realizadas", async (req, res) => {
+  try {
+    const db = await connect(); 
+    const consultas = await db.collection("consultation").find().toArray();
+    res.json(consultas);
+  } catch (error) {
+    console.error("Erro ao buscar consultas:", error);
+    res.status(500).send("Erro ao buscar consultas.");
+  }
+});
+
 
 
 module.exports = router;

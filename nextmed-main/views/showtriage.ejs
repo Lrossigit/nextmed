@@ -4,14 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Triagens Ativas</title>
-  <link rel="stylesheet" href="../public/stylesheets/styletriagem.css">
+  <link rel="stylesheet" href="/stylesheets/styletriagem.css">
   <script>
   async function carregarTriagens() {
     try {
       const resposta = await fetch("/triagens/ativas");
       const triagens = await resposta.json();
 
-      // Limpa as listas
       document.getElementById("listaPendentes").innerHTML = "";
       document.getElementById("listaAtendendo").innerHTML = "";
       document.getElementById("listaConcluidas").innerHTML = "";
@@ -29,21 +28,20 @@
       });
 
       triagens.forEach(t => {
-        const statusParaClasseELista = {
-          "Aguardando consulta": { classe: "pendente", listaId: "listaPendentes"},
-          "Em consulta": { classe: "atendendo", listaId: "listaAtendendo"},
-          "Consulta realizada": { classe: "concluida", listaId: "listaConcluidas"}
-        };
+  const li = document.createElement("li");
+  li.textContent = "Nome: " + t.Pacient + " / " + "Risco: "+ t.Risco + " / " + "Consultório: " + t.Consultório; 
 
-        const config = statusParaClasseELista[t.triage_status];
-
-        if (config) {
-          const li = document.createElement("li");
-          li.className = config.classe; 
-          li.textContent = t.Name + " / " + t.Risco + " / " + t.Consultório ;
-          document.getElementById(config.listaId).appendChild(li);
-        }
-      });
+  if (t.triage_status === "Aguardando consulta") {
+    li.className = "pendente";
+    document.getElementById("listaPendentes").appendChild(li);
+  } else if (t.triage_status === "Em consulta") {
+    li.className = "atendendo";
+    document.getElementById("listaAtendendo").appendChild(li);
+  } else if (t.triage_status === "Consulta realizada") {
+    li.className = "concluida";
+    document.getElementById("listaConcluidas").appendChild(li);
+  }
+});
     } catch (error) {
       console.error("Erro ao carregar triagens:", error);
     }

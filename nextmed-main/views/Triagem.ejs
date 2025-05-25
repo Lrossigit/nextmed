@@ -9,12 +9,28 @@
     let liberado = false;
     let pacienteAtualId = null;
 
+     async function carregarNomeUsuario() {
+  try {
+    const resposta = await fetch('/api/usuario-logado', { credentials: 'include' });
+
+    if (!resposta.ok) {
+      throw new Error('Não autorizado');
+    }
+
+    const usuario = await resposta.json();
+    document.getElementById('nomeUsuario').textContent = `Olá, ${usuario.name}!`;
+
+  } catch (error) {
+    console.error('Erro ao carregar o nome do usuário:', error);
+  }
+}
+
     async function carregarUltimoPaciente() {
       try {
         const resposta = await fetch("/api/ultimo-paciente");
         const paciente = await resposta.json();
 
-        document.getElementById("name").value = paciente.name;
+        document.getElementById("pacient").value = paciente.name;
         document.getElementById("cpf").value = paciente.CPF;
         document.getElementById("age").value = paciente.age;
 
@@ -55,7 +71,7 @@
 }
 
     function atualizarCamposPaciente(paciente) {
-      document.getElementById("name").value = paciente.name;
+      document.getElementById("pacient").value = paciente.name;
       document.getElementById("cpf").value = paciente.CPF;
       document.getElementById("age").value = paciente.age;
       pacienteAtualId = paciente._id;
@@ -96,7 +112,7 @@
 
     function iniciarTriagem() {
       const paciente = {
-        nome: document.getElementById("name").value,
+        pacient: document.getElementById("pacient").value,
         cpf: document.getElementById("cpf").value,
         idade: document.getElementById("age").value,
         acompanhante: document.querySelector('input[name="acompanhante"]:checked')?.value || "",
@@ -110,11 +126,8 @@
     window.onload = () => {
       carregarUltimoPaciente();
       configurarBotaoOutroPaciente();
-      const user = JSON.parse(sessionStorage.getItem("usuarioLogado"));
-    if (user) {
-      document.getElementById("user-name").textContent = user.nome || "Usuário";
-      document.getElementById("user-email").textContent = user.email || "email@exemplo.com";
-    }};
+      carregarNomeUsuario();
+    };
   </script>
 </head>
 <body>
@@ -123,10 +136,7 @@
     <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
   </div>
 
-  <div class="user-info">
-    <span id="user-name"></span>
-    <span id="user-email"></span>
-  </div>
+  <h1 id="nomeUsuario"></h1>
 
   <div class="logout-container">
     <form action="/logout" method="POST">
@@ -145,7 +155,7 @@
           <br><br>
       <form id="formTriagem">
         <label>Nome:
-          <input type="text" id="name" readonly />
+          <input type="text" id="pacient" readonly />
         </label>
         <label>CPF:
           <input type="text" id="cpf" readonly />

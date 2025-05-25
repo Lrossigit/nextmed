@@ -8,11 +8,27 @@
   <script>
   let abaTriagens;
 
+  async function carregarDadosDoctor() {
+  try {
+    const resposta = await fetch('/api/usuario-logado');
+    if (!resposta.ok) throw new Error('Não autorizado');
+
+    const usuario = await resposta.json();
+
+    
+    document.getElementById('Profissional').value = usuario.name || '';
+  } catch (error) {
+    console.error('Erro ao carregar dados do doctor:', error);
+  }
+}
+
   window.onload = function () {
+
+    carregarDadosDoctor();
     
     const dados = JSON.parse(sessionStorage.getItem("dadosPaciente"));
     if (dados) {
-      document.getElementById("Name").value = dados.nome || "";
+      document.getElementById("Pacient").value = dados.pacient || "";
       document.getElementById("CPF").value = dados.cpf || "";
       document.getElementById("Age").value = dados.idade || "";
       document.getElementById("Acompanhante").value = dados.acompanhante || "";
@@ -76,7 +92,7 @@
   <h2>Informações Clínicas</h2>
   <form action="/triagem/finalizar" method="post" id="conformtriagem">
     <label>Nome:
-      <input type="text" id="Name" name="Name" readonly />
+      <input type="text" id="Pacient" name="Pacient" readonly />
     </label>
     <label>CPF:
       <input type="text" id="CPF" name="CPF" readonly />
@@ -146,7 +162,7 @@
       <input type="time" id="Htriagem" name="Htriagem" readonly />
     </label>
     <label>Profissional Responsável:
-      <input type="text" id="Profissional" name="Profissional"  />
+      <input type="text" id="Profissional" name="Profissional"  readonly/>
     </label>
     <label>Encaminhamento:
       <input type="text" id="Encaminhamento" name="Encaminhamento" />

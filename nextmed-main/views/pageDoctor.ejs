@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Pagina Inicial</title>
-        <link rel="stylesheet" href="">
+          <link rel="stylesheet" href="/stylesheets/stylepageDoctor.css" />
         <script>
             let triagemAtualId = null;
             let liberado = false;
@@ -155,13 +155,13 @@
             </label>
             <br><br>
             <label for="Classificação">Classificação de Risco: </label>
-            <input type="text" id="Risco" name="Risco" required />
+            <input type="text" id="Risco" name="Risco" readonly />
             <br><br>
         </form>
         </div>
         <div class="btn-group">
         <button id="btnConsulta" onclick="iniciarConsulta()">Iniciar Consulta</button>
-        <button id="btnOutraConsulta">Iniciar outra consulta</button>
+        <button id="btnOutraConsulta">Chamar o próximo</button>
         <button type="button" onclick="window.location.href='/consultationtable'">Histórico de consultas</button>
         </div>
         </form>

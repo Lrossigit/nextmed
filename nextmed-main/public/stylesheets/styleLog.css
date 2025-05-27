@@ -48,6 +48,7 @@ form {
   flex-direction: column;
   align-items: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
 }
 
 label {
@@ -71,7 +72,7 @@ input[type="date"] {
   color: #043873;
 }
 
-input[type="date"]{
+input[type="date"] {
   text-align: center;
 }
 
@@ -109,12 +110,34 @@ button:hover {
   color: white;
 }
 
+.button-nav button {
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+  width: 100px;
+}
+
+.btn-voltar {
+  color: #043873;
+  border: 1px solid #043873;
+}
+
+.btn-cadastrar {
+background-color: #043873;
+color: #fff;
+}
+
 .popup {
   display: none;
   position: fixed;
   z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -146,7 +169,6 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  
 }
 
 .containerdoctor {
@@ -157,4 +179,10 @@ button:hover {
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/*Create nurse*/
+.button-nav {
+  display: flex;
+  gap: 10px;
 }

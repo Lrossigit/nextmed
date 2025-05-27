@@ -151,6 +151,10 @@ input[type='submit']:hover {
   background-color: #0b468a;
 }
 
+.inputSearchCPF {
+  width: 200px;
+}
+
 .logout-container {
   position: absolute;
   top: 20px;
@@ -184,8 +188,7 @@ input[type='submit']:hover {
       justify-content: center;
       align-items: center;
     }
-
-    /* Janela flutuante */
+    
     #detalhetriagem {
       background: white;
       padding: 20px;

@@ -7,7 +7,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   margin: 0;
 }
 
@@ -18,6 +17,7 @@ body {
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 40px 0 40px 0;
 }
 
 .logo {
@@ -57,7 +57,10 @@ label {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"],
+input[type="number"],
+input[type="date"] {
   width: 250px;
   padding: 10px;
   margin-top: 5px;
@@ -66,6 +69,10 @@ input[type="password"] {
   background-color: #e8f1fc;
   font-size: 14px;
   color: #043873;
+}
+
+input[type="date"]{
+  text-align: center;
 }
 
 input[type="submit"],
@@ -133,4 +140,21 @@ button:hover {
   font-size: 30px;
   color: #aaa;
   cursor: pointer;
+}
+
+.formulariodoctor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+
+.containerdoctor {
+  margin: 50px 0 50px 0;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }

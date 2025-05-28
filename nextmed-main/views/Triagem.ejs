@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Página Inicial</title>
+    <link rel="stylesheet" href="/stylesheets/styletriagem.css" />
+    <script>
+      let liberado = false;
+      let pacienteAtualId = null;
+
+      async function carregarNomeUsuario() {
+        try {
+          const resposta = await fetch("/api/usuario-logado", {
+            credentials: "include",
+          });
+
+          if (!resposta.ok) {
+            throw new Error("Não autorizado");
+          }
+
+          const usuario = await resposta.json();
+          document.getElementById(
+            "nomeUsuario"
+          ).textContent = `Olá, ${usuario.name}!`;
+        } catch (error) {
+          console.error("Erro ao carregar o nome do usuário:", error);
+        }
+      }
+
+      async function carregarUltimoPaciente() {
+        try {
+          const resposta = await fetch("/api/ultimo-paciente");
+          const paciente = await resposta.json();
+
+          document.getElementById("pacient").value = paciente.name;
+          document.getElementById("cpf").value = paciente.CPF;
+          document.getElementById("age").value = paciente.age;
+
+          pacienteAtualId = paciente._id;
+          liberado = false;
+
+          const botao = document.getElementById("btnOutroPaciente");
+          botao.disabled = true;
+          botao.style.opacity = "0.5";
+
+          setTimeout(() => {
+            liberado = true;
+            botao.disabled = false;
+            botao.style.opacity = "1";
+          }, 20 * 1000);
+        } catch (error) {
+          alert("Erro ao carregar paciente.");
+          console.error(error);
+        }
+      }
+
+      async function buscarPacientePorCpf() {
+        const cpf = document.getElementById("buscarCpf").value;
+        if (!cpf) return alert("Informe um CPF.");
+
+        try {
+          const resposta = await fetch(`/api/paciente?cpf=${cpf}`);
+          if (!resposta.ok) {
+            return alert("Paciente não encontrado.");
+          }
+
+          const paciente = await resposta.json();
+          atualizarCamposPaciente(paciente);
+        } catch (error) {
+          alert("Erro ao buscar paciente.");
+          console.error(error);
+        }
+      }
+
+      function atualizarCamposPaciente(paciente) {
+        document.getElementById("pacient").value = paciente.name;
+        document.getElementById("cpf").value = paciente.CPF;
+        document.getElementById("age").value = paciente.age;
+        pacienteAtualId = paciente._id;
+      }
+
+      function configurarBotaoOutroPaciente() {
+        const botao = document.getElementById("btnOutroPaciente");
+
+        botao.addEventListener("click", async () => {
+          if (!liberado) return;
+
+          try {
+            const resposta = await fetch(
+              `/api/proximo-paciente?excluir=${pacienteAtualId}`
+            );
+
+            if (resposta.status === 204) {
+              alert("Nenhum paciente disponível no momento.");
+              return;
+            }
+
+            const novoPaciente = await resposta.json();
+            atualizarCamposPaciente(novoPaciente);
+
+            liberado = false;
+            botao.disabled = true;
+            botao.style.opacity = "0.5";
+
+            setTimeout(() => {
+              liberado = true;
+              botao.disabled = false;
+              botao.style.opacity = "1";
+            }, 60 * 1000);
+          } catch (error) {
+            alert("Erro ao buscar próximo paciente.");
+            console.error(error);
+          }
+        });
+      }
+
+      function iniciarTriagem() {
+        const paciente = {
+          pacient: document.getElementById("pacient").value,
+          cpf: document.getElementById("cpf").value,
+          idade: document.getElementById("age").value,
+          acompanhante:
+            document.querySelector('input[name="acompanhante"]:checked')
+              ?.value || "",
+          companhia: document.getElementById("companhia").value,
+        };
+
+        sessionStorage.setItem("dadosPaciente", JSON.stringify(paciente));
+        window.location.href = "/formtriagem";
+      }
+
+      window.onload = () => {
+        carregarUltimoPaciente();
+        configurarBotaoOutroPaciente();
+        carregarNomeUsuario();
+      };
+    </script>
+  </head>
+  <body class="all-content">
+    <aside class="side-bar">
+      <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+      <button>Triagem</button>
+      <button>Histórico de consultas</button>
+    </aside>
+    <div class="content">
+      <div class="navbar">
+
+        <h1 id="nomeUsuario"></h1>
+
+        <div class="logout-container">
+          <form action="/logout" method="POST">
+            <button type="submit" class="logout-btn">Sair</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="container_triage">
+        <h2>Aguarde o paciente</h2>
+        <div class="info-group">
+          <label
+            >Buscar por CPF:
+            <input type="text" id="buscarCpf" placeholder="Digite o CPF" />
+            <button type="button" onclick="buscarPacientePorCpf()">
+              Buscar
+            </button>
+          </label>
+          <br /><br />
+          <form id="formTriagem">
+            <label
+              >Nome:
+              <input type="text" id="pacient" readonly />
+            </label>
+            <label
+              >CPF:
+              <input type="text" id="cpf" readonly />
+            </label>
+            <label
+              >Idade:
+              <input type="text" id="age" readonly />
+            </label>
+            <br /><br />
+            <label>Possui acompanhante?</label>
+            <div class="radio-group">
+              <input
+                type="radio"
+                id="acompanhante-yes"
+                name="acompanhante"
+                value="Sim"
+                required
+              />
+              <label for="acompanhante-yes">✔️</label>
+              <input
+                type="radio"
+                id="acompanhante-no"
+                name="acompanhante"
+                value="Não"
+                required
+              />
+              <label for="acompanhante-no">❌</label>
+            </div>
+            <br /><br />
+            <label
+              >Acompanhante:
+              <input type="text" id="companhia" />
+            </label>
+            <br /><br />
+          </form>
+        </div>
+        <div class="btn-group">
+          <button id="btnTriagem" onclick="iniciarTriagem()">
+            Iniciar Triagem
+          </button>
+          <button id="btnOutroPaciente">Chamar Outro Paciente</button>
+          <button type="button" onclick="window.location.href='/triagetable'">
+            Histórico de triagens
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

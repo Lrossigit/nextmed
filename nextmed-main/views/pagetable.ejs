@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerenciamento dos cadastros</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/stylesheets/stylePagetable.css" />
+    <script>
+      async function carregarPacientes() {
+        try {
+          const resposta = await fetch("/api/pacientes");
+          const pacientes = await resposta.json();
+
+          let tabela = document.querySelector("#tabelaPacientes tbody");
+          tabela.innerHTML = "";
+
+          pacientes.forEach((paciente) => {
+            const birthDate = paciente.birth
+              ? paciente.birth.split("-").reverse().join("/")
+              : "";
+            let linha = `;
+        <tr>
+          <td>${paciente.CPF}</td>
+          <td>${paciente.name}</td>
+          <td>${birthDate}</td>
+          <td>${paciente.age}</td>
+          <td>${paciente.genero}</td>
+          <td>${paciente.fonenumber}</td>
+          <td>${paciente.smoker}</td>
+          <td><button class="edit-btn" data-id="${paciente._id}">Editar</button></td>
+          <td><button class="delete-btn" data-id="${paciente._id}"><i class="fa-solid fa-trash"></i></button></td>  
+        </tr>
+      `;
+            tabela.innerHTML += linha;
+          });
+
+          tabela.addEventListener("click", async (e) => {
+            const btn = e.target.closest(".delete-btn");
+            if (!btn) return;
+
+            const patientId = btn.getAttribute("data-id");
+
+            const response = await fetch("/delete", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ id: patientId }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+              alert("Paciente deletado com sucesso!");
+              carregarPacientes(); // Recarrega a lista
+            }
+          });
+
+          document.querySelectorAll(".edit-btn").forEach((button) => {
+            button.addEventListener("click", (e) => {
+              const patientId = e.target.getAttribute("data-id");
+              const paciente = pacientes.find((p) => p._id === patientId);
+
+              if (paciente) {
+                document.getElementById("CPF").value = paciente.CPF;
+                document.getElementById("name").value = paciente.name;
+                document.getElementById("birth").value = paciente.birth;
+                document.getElementById("genero").value = paciente.genero;
+                document.getElementById("fonenumber").value =
+                  paciente.fonenumber;
+                document.getElementById("smokerSim").checked =
+                  paciente.smoker === "Sim";
+                document.getElementById("smokerNao").checked =
+                  paciente.smoker === "Não";
+
+                document.getElementById("telaedit").style.display = "block";
+
+                document.getElementById("formedit").onsubmit = async (
+                  event
+                ) => {
+                  event.preventDefault();
+
+                  const formData = new FormData(event.target);
+                  const updatedPaciente = Object.fromEntries(
+                    formData.entries()
+                  );
+                  updatedPaciente.id = patientId;
+
+                  const response = await fetch("/edit", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedPaciente),
+                  });
+
+                  const result = await response.json();
+                  if (result.success) {
+                    alert("Paciente atualizado com sucesso!");
+                    document.getElementById("telaedit").style.display = "none";
+                    carregarPacientes();
+                  } else {
+                    alert("Erro ao atualizar paciente.");
+                  }
+                };
+              }
+            });
+          });
+        } catch (error) {
+          console.error("Erro ao carregar pacientes:", error);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const inputBusca = document.querySelector("#inputBusca");
+        inputBusca.addEventListener("input", () =>
+          filtrarPacientes(inputBusca.value)
+        );
+      });
+
+      function filtrarPacientes(query) {
+        const linhas = document.querySelectorAll("#tabelaPacientes tbody tr");
+        query = query.toLowerCase();
+
+        linhas.forEach((linha) => {
+          const nome = linha.children[1].textContent.toLowerCase(); // Assume que o nome está na segunda coluna
+          const cpf = linha.children[0].textContent.toLowerCase(); // Assume que o CPF está na primeira coluna
+
+          if (nome.includes(query) || cpf.includes(query)) {
+            linha.style.display = "";
+          } else {
+            linha.style.display = "none";
+          }
+        });
+      }
+
+      window.onload = carregarPacientes;
+    </script>
+  </head>
+  <body>
+    <div class="logo">
+      <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+      <div class="logout-conteiner">
+        <form action="/logout" method="POST">
+          <button type="submit" class="logout-btn">Sair</button>
+        </form>
+      </div>
+    </div>
+    <h2>Lista de Pacientes</h2>
+
+    <header>
+      <nav class="container-search">
+        <form action="" method="get" class="form-group">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="search"
+            class="inputSearchCPF"
+            id="inputBusca"
+            placeholder="Pesquise por nome ou CPF"
+            required
+          />
+        </form>
+      </nav>
+    </header>
+
+    <table id="tabelaPacientes">
+      <thead>
+        <tr>
+          <th>CPF</th>
+          <th>Nome</th>
+          <th>Data de Nascimento</th>
+          <th>Idade</th>
+          <th>Genero</th>
+          <th>Telefone</th>
+          <th>É fumante?</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <br />
+
+    <button onclick="window.location.href='/AddUser'">
+      Adicionar Paciente
+    </button>
+    <div class="tela-edit-group">
+      <div id="telaedit" style="display: none">
+        <div class="form">
+          <form id="formedit" action="edit" method="POST">
+            <p>
+              <label
+                >Nome Completo:
+                <input type="text" name="name" id="name" required />
+              </label>
+            </p>
+            <p>
+              <label
+                >CPF:
+                <input type="number" name="CPF" id="CPF" required />
+              </label>
+            </p>
+            <p>
+              <label
+                >Data de nascimento:
+                <input type="date" name="birth" id="birth" required />
+              </label>
+            </p>
+            <p>
+              <label for="genero">Gênero:</label>
+              <select id="genero" name="genero" required>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="NãoBinario">Não Binário</option>
+              </select>
+            </p>
+            <p>
+              <label
+                >Telefone:
+                <input
+                  type="number"
+                  name="fonenumber"
+                  id="fonenumber"
+                  required
+                />
+              </label>
+            </p>
+            <p>
+              <label>É fumante?</label>
+              <input
+                type="radio"
+                name="smoker"
+                value="Sim"
+                id="smokerSim"
+                required
+              />
+              Sim
+              <input
+                type="radio"
+                name="smoker"
+                value="Não"
+                id="smokerNao"
+                required
+              />
+              Não
+            </p>
+            <p>
+              <input type="submit" value="Salvar" />
+            </p>
+
+            <button onclick="window.location.href='/pagetable'">Voltar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

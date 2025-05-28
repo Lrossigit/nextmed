@@ -1,0 +1,57 @@
+button {
+  background-color: transparent;
+  color: #043873;
+  border: 1px solid #043873;
+  padding: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.container-sidebar button {
+    all: unset;
+    width: 100%;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.container-sidebar button:hover {
+    background-color: #043873;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+.container-sidebar form {
+    all: unset;
+    width: 100%;
+}
+
+.container-sidebar form button:hover {
+    width: 100%;
+    color: #fff;
+    background-color: rgb(248, 70, 70);
+}
+
+.btn-iniciarAtendimento {
+  color: #fff;
+  background-color: #043873;
+}
+
+.btn-chamarOutroPaciente {
+  color: #043873;
+  border: 1px solid #043873;
+}
+
+.btn-search {
+  all: unset;
+  background-color: #043873;
+  color: #fff;
+  text-align: center;
+  height: 100%;
+  width: 20%;
+  border-radius: 0 20px 20px 0;
+  cursor: pointer;
+  border: none;
+}

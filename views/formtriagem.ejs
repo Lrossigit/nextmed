@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preenchendo Triagem</title>
+    <link rel="stylesheet" href="/stylesheets/styletriagem.css" />
+    <script>
+      let abaTriagens;
+
+      async function carregarDadosDoctor() {
+        try {
+          const resposta = await fetch("/api/usuario-logado");
+          if (!resposta.ok) throw new Error("Não autorizado");
+
+          const usuario = await resposta.json();
+
+          document.getElementById("Profissional").value = usuario.name || "";
+        } catch (error) {
+          console.error("Erro ao carregar dados do doctor:", error);
+        }
+      }
+
+      window.onload = function () {
+        carregarDadosDoctor();
+
+        const dados = JSON.parse(sessionStorage.getItem("dadosPaciente"));
+        if (dados) {
+          document.getElementById("Pacient").value = dados.pacient || "";
+          document.getElementById("CPF").value = dados.cpf || "";
+          document.getElementById("Age").value = dados.idade || "";
+          document.getElementById("Acompanhante").value =
+            dados.acompanhante || "";
+          document.getElementById("Companhia").value = dados.companhia || "";
+        } else {
+          alert("Dados do paciente não encontrados.");
+        }
+
+        const agora = new Date();
+        const data = agora.toISOString().split("T")[0];
+        const horas = agora.getHours().toString().padStart(2, "0");
+        const minutos = agora.getMinutes().toString().padStart(2, "0");
+
+        document.getElementById("DataChegada").value = data;
+        document.getElementById("Htriagem").value = `${horas}:${minutos}`;
+
+        // Envia o formulário
+        document
+          .getElementById("conformtriagem")
+          .addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            abaTriagens = window.open("/showtriage", "AbaTriagens");
+
+            const form = document.getElementById("conformtriagem");
+            const formData = new FormData(form);
+
+            try {
+              const resposta = await fetch("/triagem/finalizar", {
+                method: "POST",
+                body: formData,
+              });
+
+              if (resposta.ok) {
+                alert("Formulário enviado com sucesso!");
+                window.location.href = "/Triagem";
+              } else {
+                console.log("Status da resposta:", resposta.status);
+                alert("Erro ao enviar o formulário.");
+              }
+            } catch (error) {
+              alert("Erro na conexão com o servidor.");
+              console.error(error);
+            }
+          });
+      };
+    </script>
+  </head>
+  <body>
+    <div class="container-navbar">
+      <nav>
+        <div class="logo">
+          <img src="/imgs/logo.svg" style="height: 20px" alt="NextMed Logo" />
+        </div>
+        <div class="logout-conteiner">
+          <form action="/logout" method="POST">
+            <button type="submit" class="logout-btn">Sair</button>
+          </form>
+        </div>
+      </nav>
+    </div>
+    <h2>Informações Clínicas</h2>
+    <form action="/triagem/finalizar" method="post" id="conformtriagem">
+      <label
+        >Nome:
+        <input type="text" id="Pacient" name="Pacient" readonly />
+      </label>
+      <label
+        >CPF:
+        <input type="text" id="CPF" name="CPF" readonly />
+      </label>
+      <label
+        >Idade:
+        <input type="text" id="Age" name="Age" readonly />
+      </label>
+      <label
+        >Acompanhante:
+        <input type="text" id="Acompanhante" name="Acompanhante" readonly />
+      </label>
+      <label
+        >Companhia:
+        <input type="text" id="Companhia" name="Companhia" readonly />
+      </label>
+      <br />
+      <label
+        >Frequência Cardíaca:
+        <input type="text" id="FrCardiaca" name="FrCardiaca" required />
+      </label>
+      <label
+        >Temperatura:
+        <input type="text" id="Temperatura" name="Temperatura" required />
+      </label>
+      <label
+        >Pressão Arterial:
+        <input type="text" id="PressaoSang" name="PressaoSang" required />
+      </label>
+      <label
+        >Saturação de O2:
+        <input type="text" id="Saturacao" name="Saturacao" required />
+      </label>
+
+      <h2>Informações Clínicas</h2>
+      <label
+        >Queixa Principal:
+        <input type="text" id="Queixa" name="Queixa" required />
+      </label>
+      <label
+        >Histórico Médico:
+        <input type="text" id="HistMedico" name="HistMedico" required />
+      </label>
+      <label
+        >Início dos Sintomas:
+        <input type="date" id="InicioSint" name="InicioSint" required />
+      </label>
+      <label
+        >Uso de Medicações Contínuas:
+        <input type="text" id="UsoDeMedicacao" name="UsoDeMedicacao" />
+      </label>
+      <label
+        >Alergia Medicamentosa:
+        <input type="text" id="AlergiaMed" name="AlergiaMed" />
+      </label>
+      <label
+        >Nível de Dor:
+        <input type="text" id="NivelDaDor" name="NivelDaDor" />
+      </label>
+
+      <h2>Classificação</h2>
+      <label for="Classificação">Classificação de Risco</label>
+      <select id="Risco" name="Risco" required>
+        <option value="" disabled selected>Selecione</option>
+        <option value="Emergencia">Emergência</option>
+        <option value="Muito Urgente">Muito Urgente</option>
+        <option value="Urgente">Urgente</option>
+        <option value="Pouco Urgente">Pouco Urgente</option>
+        <option value="Não urgente">Não urgente</option>
+      </select>
+      <label
+        >Justificativa:
+        <input type="text" id="Justificativa" name="Justificativa" required />
+      </label>
+
+      <h2>Dados Operacionais</h2>
+      <label
+        >Data da Triagem:
+        <input type="text" id="DataChegada" name="DataChegada" readonly />
+      </label>
+      <label
+        >Hora da Triagem:
+        <input type="time" id="Htriagem" name="Htriagem" readonly />
+      </label>
+      <label
+        >Profissional Responsável:
+        <input type="text" id="Profissional" name="Profissional" readonly />
+      </label>
+      <label
+        >Encaminhamento:
+        <input type="text" id="Encaminhamento" name="Encaminhamento" />
+      </label>
+
+      <button type="submit">Finalizar Triagem</button>
+      <button type="button" onclick="window.location.href='/Triagem'">
+        Voltar
+      </button>
+    </form>
+  </body>
+</html>

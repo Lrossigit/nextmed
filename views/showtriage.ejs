@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triagens Ativas</title>
+  <link rel="stylesheet" href="/stylesheets/styletriagem.css">
+  <script>
+  async function carregarTriagens() {
+    try {
+      const resposta = await fetch("/triagens/ativas");
+      const triagens = await resposta.json();
+
+      document.getElementById("listaPendentes").innerHTML = "";
+      document.getElementById("listaAtendendo").innerHTML = "";
+      document.getElementById("listaConcluidas").innerHTML = "";
+
+      const ordemPrioridade = {
+        "Emergência": 0,
+        "Muito Urgente": 1,
+        "Urgente": 2,
+        "Pouco Urgente": 3,
+        "Não Urgente": 4
+      };
+
+      triagens.sort((a, b) => {
+        return ordemPrioridade[a.Risco] - ordemPrioridade[b.Risco];
+      });
+
+      triagens.forEach(t => {
+  const li = document.createElement("li");
+  li.textContent = "Nome: " + t.Pacient + " / " + "Risco: "+ t.Risco + " / " + "Consultório: " + t.Consultório; 
+
+  if (t.triage_status === "Aguardando consulta") {
+    li.className = "pendente";
+    document.getElementById("listaPendentes").appendChild(li);
+  } else if (t.triage_status === "Em consulta") {
+    li.className = "atendendo";
+    document.getElementById("listaAtendendo").appendChild(li);
+  } else if (t.triage_status === "Consulta realizada") {
+    li.className = "concluida";
+    document.getElementById("listaConcluidas").appendChild(li);
+  }
+});
+    } catch (error) {
+      console.error("Erro ao carregar triagens:", error);
+    }
+  }
+
+  window.onload = () => {
+    carregarTriagens();
+    setInterval(carregarTriagens, 5000);
+  };
+</script>
+</head>
+<body>
+  <h2>Pacientes em Triagem</h2>
+
+  <h3>Pendentes</h3>
+  <ul id="listaPendentes"></ul>
+
+  <h3>Em Atendimento</h3>
+  <ul id="listaAtendendo"></ul>
+
+  <h3>Concluídas</h3>
+  <ul id="listaConcluidas"></ul>
+</body>
+</html>

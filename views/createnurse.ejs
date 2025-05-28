@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro Infermeira</title>
+    <link rel="stylesheet" href="/stylesheets/styleLog.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img src="/imgs/logo.svg" alt="NextMed Logo" />
+      </div>
+      <div class="formularionurse">
+        <h2>Criar nova conta</h2>
+        <form action="/registronurse" method="POST">
+          <label for="name">Nome:</label>
+          <input type="text" name="name" id="name" required />
+          <label for="birth">Data de nacimento:</label>
+          <input type="date" name="birth" id="birth" required />
+          <label for="cpf">CPF:</label>
+          <input type="number" name="cpf" id="cpf" required />
+          <label for="fonenumber">Telefone:</label>
+          <input type="number" name="fonenumber" id="fonenumber" required />
+          <label for="email">E-mail:</label>
+          <input type="text" name="email" id="email" required />
+          <label for="password">Senha:</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Crie uma senha"
+            required
+          />
+          <input
+            type="password"
+            name="password_repeat"
+            placeholder="Repita a senha"
+            required
+          />
+          <div class="button-nav">
+            <button onclick="window.location.href='/'" class="btn-voltar">
+              Voltar
+            </button>
+            <button type="submit" value="Cadastrar" class="btn-cadastrar">Cadastrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

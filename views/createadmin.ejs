@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/stylesheets/styleLog.css" />
+    <title>Cadastro admin</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img src="/imgs/logo.svg" alt="NextMed Logo" />
+      </div>
+      <div class="formulario">
+        <h2>Criar nova conta</h2>
+        <form action="/registro" method="POST">
+          <label for="email">E-mail:</label>
+          <input type="text" name="email" id="email" required />
+
+          <label for="password">Senha:</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Crie uma senha"
+            required
+          />
+          <input
+            type="password"
+            name="password_repeat"
+            placeholder="Repita a senha"
+            required
+          />
+          <div class="button-nav">
+            <button onclick="window.location.href='/'" class="btn-voltar">
+              Voltar
+            </button>
+            <button type="submit" value="Criar Conta" class="btn-cadastrar">
+              Cadastrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

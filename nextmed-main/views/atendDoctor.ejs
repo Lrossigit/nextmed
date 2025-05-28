@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Atendimento</title>
-  <link rel="stylesheet" href="" />
+  <link rel="stylesheet" href="\stylesheets\styleatendDoctor.css" />
   <script>
 
     async function carregarDadosDoctor() {
@@ -108,68 +108,74 @@
   </div>
 
   <form action="/consulta/encaminhar" method="post" id="confirmconsulta">
-    <h2>Dados da Triagem</h2>
-    <label>Nome:
-      <input type="text" id="Pacient" name="Pacient" readonly />
-    </label>
-    <label>Idade:
-      <input type="text" id="Age" name="Age" readonly />
-    </label>
-    <label>CPF:
-      <input type="text" id="CPF" name="CPF" readonly />
-    </label>
+     <div class = "noinput">
+      <h2>Dados da Triagem</h2>
+      <label>Nome:
+        <input type="text" id="Pacient" name="Pacient" readonly />
+      </label>
+      <label>Idade:
+        <input type="text" id="Age" name="Age" readonly />
+      </label>
+      <label>CPF:
+        <input type="text" id="CPF" name="CPF" readonly />
+      </label>
 
-    <label>Acompanhante:
-      <input type="text" id="Companhia" name="Companhia" readonly />
-    </label>
-    <label>Data da Triagem:
-      <input type="text" id="Dchegada" name="DataChegada" readonly />
-    </label>
-    <br /><br />
-    <label>Hora da Triagem:
-      <input type="text" id="Htriagem" name="Htriagem" readonly />
-    </label>
-    <label>Profissional Responsável:
-      <input type="text" id="Nurse" name="Nurse" readonly />
-    </label>
+      <label>Acompanhante:
+        <input type="text" id="Companhia" name="Companhia" readonly />
+      </label>
+      <label>Data da Triagem:
+        <input type="text" id="Dchegada" name="DataChegada" readonly />
+      </label>
+      <br /><br />
+      <label>Hora da Triagem:
+        <input type="text" id="Htriagem" name="Htriagem" readonly />
+      </label>
+      <label>Profissional Responsável:
+        <input type="text" id="Nurse" name="Nurse" readonly />
+      </label>
 
-    <label>Queixa:
-      <input type="text" id="Queixa" name="Queixa" readonly />
-    </label>
-    <br /><br />
-    <label>Nível da dor:
-      <input type="text" id="NivelDor" name="NivelDaDor" readonly />
-    </label>
-    <label>Justificativa:
-      <input type="text" id="Justificativa" name="Justificativa" readonly />
-    </label>
+      <label>Queixa:
+        <input type="text" id="Queixa" name="Queixa" readonly />
+      </label>
+      <br /><br />
+      <label>Nível da dor:
+        <input type="text" id="NivelDor" name="NivelDaDor" readonly />
+      </label>
+      <label>Justificativa:
+        <input type="text" id="Justificativa" name="Justificativa" readonly />
+      </label>
 
-    <h2>Dados do Médico</h2>
-    <label>Nome do Doutor:
-    <input type="text" id="Doctor" name="Doctor" readonly />
-    </label>
-    <label>CRM do Doutor:
-    <input type="text" id="CRM" name="CRM" readonly />
-    </label>
+      <h2>Dados do Médico</h2>
+      <label>Nome do Doutor:
+      <input type="text" id="Doctor" name="Doctor" readonly />
+      </label>
+      <label>CRM do Doutor:
+      <input type="text" id="CRM" name="CRM" readonly />
+      </label>
+    </div>
+      
+    <div class = "withinput">
+      <h2>Diagnóstico</h2>
+      <label>Descrição do Diagnóstico:
+        <input type="text" id="Diagnóstico" name="Diagnostico" />
+      </label>
+      <label>Medicamento Receitado:
+        <input type="text" id="Medicamento" name="Medicamento" />
+      </label>
+      <br /><br />
+      <label>Encaminhamento (Se necessário):
+        <input type="text" id="Encaminhamento" name="Encaminhamento" />
+      </label>
+      <label>Observações:
+        <input type="text" id="Obs" name="Obs" />
+      </label>
+    </div>
 
-    <h2>Diagnóstico</h2>
+    <div class="button-group">
+      <button type="submit">Finalizar Consulta</button>
+      <button type="button" onclick="window.location.href='/pageDoctor'">Voltar</button>
+    </div>
 
-    <label>Descrição do Diagnóstico:
-      <input type="text" id="Diagnóstico" name="Diagnostico" />
-    </label>
-    <label>Medicamento Receitado:
-      <input type="text" id="Medicamento" name="Medicamento" />
-    </label>
-    <br /><br />
-    <label>Encaminhamento (Se necessário):
-      <input type="text" id="Encaminhamento" name="Encaminhamento" />
-    </label>
-    <label>Observações:
-      <input type="text" id="Obs" name="Obs" />
-    </label>
-
-    <button type="submit">Finalizar Consulta</button>
-    <button type="button" onclick="window.location.href='/pageDoctor'">Voltar</button>
   </form>
 </body>
 </html>

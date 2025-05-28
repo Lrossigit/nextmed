@@ -28,8 +28,23 @@ Qualquer máquina com:
 
 ## Instalação
 
-Instale nextmed com npm
+1. Verifique os requisitos mínimos e instale o Node.js em sua máquina
+```bash
+  https://nodejs.org/en/download
+```
 
+2. Clone o repositório
+   2.1 Navegar até a pasta e abra ela no terminal
+```bash
+  cd caminho/para/minha/pasta
+```
+   2.2 Já dentro da pasta, clone o repositório 
+```bash
+  git clone https://github.com/Lrossigit/nextmed
+```
+3. Instalação dos componentes com npm
+   3.1 Abra o terminal dentro da pasta "nextmed-main"
+   3.2 Instale os componentes e inicie o servidor local
 ```bash
   npm install
   npm start

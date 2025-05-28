@@ -29,8 +29,7 @@
           document.getElementById("Pacient").value = dados.pacient || "";
           document.getElementById("CPF").value = dados.cpf || "";
           document.getElementById("Age").value = dados.idade || "";
-          document.getElementById("Acompanhante").value =
-            dados.acompanhante || "";
+          
           document.getElementById("Companhia").value = dados.companhia || "";
         } else {
           alert("Dados do paciente não encontrados.");
@@ -38,10 +37,13 @@
 
         const agora = new Date();
         const data = agora.toISOString().split("T")[0];
+        const datahj = data
+              ? data.split("-").reverse().join("/")
+              : "";
         const horas = agora.getHours().toString().padStart(2, "0");
         const minutos = agora.getMinutes().toString().padStart(2, "0");
 
-        document.getElementById("DataChegada").value = data;
+        document.getElementById("DataChegada").value = datahj;
         document.getElementById("Htriagem").value = `${horas}:${minutos}`;
 
         // Envia o formulário
@@ -105,10 +107,6 @@
       </label>
       <label
         >Acompanhante:
-        <input type="text" id="Acompanhante" name="Acompanhante" readonly />
-      </label>
-      <label
-        >Companhia:
         <input type="text" id="Companhia" name="Companhia" readonly />
       </label>
       <br />
